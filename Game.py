@@ -1,33 +1,52 @@
 import json
 from Room import Room
 
+location = 1 # the starting room always has ID 1, changes later in the game
+
+# all the actions the player can do
 def lost():
     print("You're feeling a little lost.")
     print("You could *cry* for help.")
 
 def help():
     print("Following commands are available:")
-    print("cry, help, quit")
+    print("cry, help, inspect, look, quit")
+
+def inspect():
+    print("You are inspecting the place, it looks like")
+    print("")
+    print(rooms.get(location).image)
+
+def look():
+    print("You have arrived at " + rooms.get(location).name)
+
+# open the JSON data file and build all object dictionnaries
+rooms = dict()
 
 f = open("data.json")
 data = json.load(f)
 
 for i in data["rooms"]:
-    print(i["room_name"])
+    room = Room()
+    room.name = i["name"]
+    img = open(i["image"], "r")
+    room.image = img.read()
+    rooms.update({int(i["id"]): room})
 
-myroom = Room()
-myroom.name = "Start"
-print(myroom.name)
+f.close()
 
+# start the game until the player decides to quit
 while True:
     cmd = input("> ")
     if (cmd == "help"):
         help()
     elif (cmd == "cry"):
         help()
+    elif (cmd == "look"):
+        look()
+    elif (cmd == "inspect"):
+        inspect()
     elif (cmd == "quit"):
         break
     else:
         lost()
-
-f.close()

@@ -1,7 +1,9 @@
 {
     "rooms": [
         {
-            "room_name": "The North Pole - Orientation"
+            "id": "01",
+            "name": "The North Pole - Orientation",
+            "image": "room01.txt"
         }
     ]
 }
