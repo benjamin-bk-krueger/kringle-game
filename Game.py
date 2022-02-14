@@ -29,6 +29,8 @@ data = json.load(f)
 for i in data["rooms"]:
     room = Room()
     room.name = i["name"]
+    # images have been created here: https://manytools.org/hacker-tools/convert-image-to-ansi-art/
+    # size: 160 characters
     img = open(i["image"], "r")
     room.image = img.read()
     rooms.update({int(i["id"]): room})
