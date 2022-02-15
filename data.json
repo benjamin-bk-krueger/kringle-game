@@ -3,8 +3,17 @@
         {
             "id": "01",
             "name": "The North Pole - Orientation",
-            "description": "This is the entry point to this years KringleCon",
+            "description": "This is the entry point to this years KringleCon.",
             "image": "room01"
+        }
+    ],
+    "objectives": [
+        {
+            "id": "01",
+            "name": "Jingle Ringford ",
+            "description": "Elf standing next to a Terminal",
+            "image": "objective01",
+            "location": "01"
         }
     ]
 }

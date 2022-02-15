@@ -1,10 +1,15 @@
 import os
 import json
+from Object import Object
 from Room import Room
+from Objective import Objective
 
 location = 1 # the starting room always has ID 1, changes later in the game
-rows = 24
-columns = 80
+rows = 24 # default terminal heigth
+columns = 80 # default terminal width, necessary to render ansii images
+
+rooms = dict()
+objectives = dict()
 
 # all the actions the player can do
 def lost():
@@ -14,7 +19,7 @@ def lost():
 def help():
     print("A magical voice whispers into your ear.")
     print("Following commands are available:")
-    print("cry, exit, help, inspect, look, quit")
+    print("cry, exit, help, inspect, look, quit, remember")
 
 def inspect():
     print("You are inspecting the place, it looks like")
@@ -30,12 +35,20 @@ def inspect():
         print(img.read())
     print(rooms.get(location).description)
 
+    for id in objectives:
+        print(objectives[id].location)
+        if (objectives[id].location == location):
+            print("In this room you can see " + objectives[id].name + " which is " + objectives[id].description)
+
+
 def look():
     print("You have arrived at " + rooms.get(location).name)
 
-# open the JSON data file and build all object dictionnaries
-rooms = dict()
+def remember():
+    print("A quest to save Santa has sent you here.")
+    print("You think about all those creatures here could help you.")
 
+# open the JSON data file and build all object dictionnaries
 f = open("data.json")
 data = json.load(f)
 
@@ -46,11 +59,22 @@ for i in data["rooms"]:
     room.image = i["image"]
     rooms.update({int(i["id"]): room})
 
+for i in data["objectives"]:
+    objective = Objective()
+    objective.name = i["name"]
+    objective.description = i["description"]
+    objective.image = i["image"]
+    objective.location = i["location"]
+    objectives.update({int(i["id"]): objective})
+
 f.close()
 
 # start the game until the player decides to quit
 print ("You are arriving at a strange location.")
 print ("You are feeling a little dizzy.")
+print ("")
+remember()
+
 while True:
     s_rows, s_columns = os.popen('stty size', 'r').read().split()
     rows = int(s_rows)
@@ -69,5 +93,7 @@ while True:
         inspect()
     elif (cmd == "quit"):
         break
+    elif (cmd == "remember"):
+        remember()
     else:
         lost()
