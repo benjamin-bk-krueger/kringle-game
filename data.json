@@ -3,7 +3,8 @@
         {
             "id": "01",
             "name": "The North Pole - Orientation",
-            "image": "room01.txt"
+            "description": "This is the entry point to this years KringleCon",
+            "image": "room01"
         }
     ]
 }
