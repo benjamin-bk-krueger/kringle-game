@@ -1,19 +1,19 @@
 {
     "rooms": [
         {
-            "id": "01",
+            "id": 1,
             "name": "The North Pole - Orientation",
-            "description": "This is the entry point to this years KringleCon.",
+            "description": "This is the entry point to this years KringleCon. In front of you you can see a green fence.",
             "image": "room01"
         }
     ],
     "objectives": [
         {
-            "id": "01",
-            "name": "Jingle Ringford ",
-            "description": "Elf standing next to a Terminal",
+            "id": 1,
+            "name": "Jingle Ringford",
+            "description": "an Elf standing next to a Terminal",
             "image": "objective01",
-            "location": "01"
+            "location": 1
         }
     ]
 }

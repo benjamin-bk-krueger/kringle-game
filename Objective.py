@@ -1,6 +1,5 @@
 from Object import Object
 
-
 class Objective(Object):
     """
     Defines an objective which you can achieve
