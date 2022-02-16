@@ -1,5 +1,7 @@
-import os
-import json
+import os       # necessary to access terminal size
+import json     # necessary to read json-based data file
+import readline # necessary to be able to auto-complete user
+
 from Object import Object
 from Room import Room
 from Objective import Objective
@@ -11,6 +13,8 @@ columns = 80    # default terminal width, necessary to render ansii images
 
 rooms = dict()          # contains all available rooms
 objectives = dict()     # contains all available objectives
+
+volcab = []             # contains autocomplete values
 
 # ANSII images have been created with the help of https://manytools.org/hacker-tools/convert-image-to-ansi-art/
 # size formats: 80, 160 characters
@@ -26,6 +30,8 @@ def lost():
 def help():
     print("A magical voice whispers into your ear. Following commands are available:")
     print("cry, exit, help, inspect, medidate, scout, talk, quit")
+    print("Then it whispers:")
+    print("TAB is your friend")
 
 def inspect():
     print("You are inspecting the place and looking around...")
@@ -35,6 +41,11 @@ def inspect():
     for id in objectives:
         if (objectives[id].location == location):
             print("In this room you can see " + objectives[id].name + ", " + objectives[id].description + ".")
+            print("    " + objectives[id].name + " seems to know something about a main objective.")
+            if (objectives[id].visited):
+                print("    " + "You already have talked to " + objectives[id].name + " before.")
+            else:
+                print("    " + "You have not talked to " + objectives[id].name + " yet.")
 
 def meditate():
     print("A quest to save Santa has brought you to this place.")
@@ -44,20 +55,42 @@ def scout():
     print("You have arrived at " + rooms.get(location).name)
 
 def talk():
-    print("You decide to talk to ...")
+    global volcab
+    new_volcab = []
+    counter = 0
     for id in objectives:
         if (objectives[id].location == location):
-            print(str(id) + ": " + objectives[id].name)
-    talk = input("--> ")
-    for id in objectives:
-        if (objectives[id].location == location):
-            if (str(id) == talk):
-                print("You are talking to " + objectives[id].name)
-                display_image(objectives[id].image)
-            else:
-                print("... no one here in the room.")
+            counter = counter + 1
+            new_volcab.append(objectives[id].name)
+    if (counter > 0):
+        set_custom_complete(new_volcab)
+        print("")
+        talk = input("I want to talk to > ")
+        for id in objectives:
+            if (objectives[id].location == location):
+                if (objectives[id].name == talk):
+                    print("You are talking to " + objectives[id].name)
+                    display_image(objectives[id].image)
+                    objectives[id].visited = True
+                else:
+                    print("You decide you don't want to talk right now.")
+    else:
+        "After a moment you realize no one is in this room."
+    set_default_complete()
 
 # helper functions
+def set_default_complete():
+    global volcab
+    volcab = ['help','cry','exit','inspect','meditate','scout','talk','quit']
+
+def set_custom_complete(list):
+    global volcab
+    volcab = list
+
+def complete(text,state):
+    results = [x for x in volcab if x.startswith(text)] + [None]
+    return results[state]
+
 def display_image(image_name):
     if (columns < 80):
         print("...but your view space is too small to see all the details.")
@@ -88,7 +121,8 @@ def load_data():
 
 def query_user():
     global cont
-    cmd = input("> ")
+    print("")
+    cmd = input("I want to > ")
     if (cmd == "help"):
         help()
     elif (cmd == "cry"):
@@ -97,7 +131,7 @@ def query_user():
         cont = 0
     elif (cmd == "inspect"):
         inspect()
-    elif (cmd == "medidate"):
+    elif (cmd == "meditate"):
         meditate()
     elif (cmd == "scout"):
         scout()
@@ -107,6 +141,11 @@ def query_user():
         cont = 0
     else:
         lost()
+
+set_default_complete()
+#readline.parse_and_bind("tab: complete") # Linux
+readline.parse_and_bind ("bind ^I rl_complete") # Mac
+readline.set_completer(complete)
 
 # open the JSON data file and build all object dictionnaries
 load_data()
