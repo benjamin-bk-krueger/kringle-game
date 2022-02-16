@@ -26,7 +26,14 @@
         {
             "id": 1,
             "destination": 2,
-            "description": "In front of you"
+            "description": "In front of you",
+            "location": 1
+        },
+        {
+            "id": 2,
+            "destination": 1,
+            "description": "Behind of you",
+            "location": 2
         }
     ]
 }
