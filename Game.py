@@ -1,6 +1,7 @@
 import os       # necessary to access terminal size
 import json     # necessary to read json-based data file
-import readline # necessary to be able to auto-complete user
+import readline
+from Junction import Junction # necessary to be able to auto-complete user
 
 from Object import Object
 from Room import Room
@@ -13,6 +14,7 @@ columns = 80    # default terminal width, necessary to render ansii images
 
 rooms = dict()          # contains all available rooms
 objectives = dict()     # contains all available objectives
+junctions = dict()      # contains all junctions between the rooms
 
 volcab = []             # contains autocomplete values
 
@@ -29,7 +31,7 @@ def lost():
 
 def help():
     print("A magical voice whispers into your ear. Following commands are available:")
-    print("cry, exit, help, inspect, medidate, scout, talk, quit")
+    print("cry, exit, help, inspect, medidate, scout, talk, quit, walk")
     print("Then it whispers:")
     print("TAB is your friend")
 
@@ -46,6 +48,14 @@ def inspect():
                 print("    " + "You already have talked to " + objectives[id].name + " before.")
             else:
                 print("    " + "You have not talked to " + objectives[id].name + " yet.")
+    
+    for id in junctions:
+        if (junctions[id].coming_from == location):
+            print(junctions[id].descfrom + " you can see a junction to " + rooms.get(junctions[id].going_to).name)
+            if (rooms.get(junctions[id].going_to).visited):
+                print ("    " + "You have visited that location already.")
+            else:
+                print ("    " + "You have not seen that location yet.")
 
 def meditate():
     print("A quest to save Santa has brought you to this place.")
@@ -78,10 +88,32 @@ def talk():
         "After a moment you realize no one is in this room."
     set_default_complete()
 
+def walk():
+    global volcab
+    global location
+    new_volcab = []
+    counter = 0
+    for id in junctions:
+        if (junctions[id].coming_from == location):
+            counter = counter + 1
+            new_volcab.append(rooms.get(junctions[id].going_to).name)
+    if (counter > 0):
+        set_custom_complete(new_volcab)
+        print ("")
+        walk = input("I want to go to > ")
+        for id in junctions:
+            if (junctions[id].coming_from == location):
+                if (rooms.get(junctions[id].going_to).name == walk):
+                    print("You are going to " + rooms.get(junctions[id].going_to).name)
+                    location = junctions[id].going_to
+    else:
+        "After a moment you realize there is no way out of this room."
+    set_default_complete()
+
 # helper functions
 def set_default_complete():
     global volcab
-    volcab = ['help','cry','exit','inspect','meditate','scout','talk','quit']
+    volcab = ['help','cry','exit','inspect','meditate','scout','talk','quit','walk']
 
 def set_custom_complete(list):
     global volcab
@@ -117,6 +149,13 @@ def load_data():
         objective.image = i["image"]
         objective.location = i["location"]
         objectives.update({i["id"]: objective})
+    for i in data["junctions"]:
+        junction = Junction()
+        junction.coming_from = i["coming_from"]
+        junction.going_to = i["going_to"]
+        junction.descfrom = i["descfrom"]
+        junction.descto = i["descto"]
+        junctions.update({i["id"]: junction})
     f.close()
 
 def query_user():
@@ -139,6 +178,8 @@ def query_user():
         talk()
     elif (cmd == "quit"):
         cont = 0
+    elif (cmd == "walk"):
+        walk()
     else:
         lost()
 
