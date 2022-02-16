@@ -5,6 +5,12 @@
             "name": "The North Pole - Orientation",
             "description": "This is the entry point to this years KringleCon. In front of you you can see a green fence.",
             "image": "room01"
+        },
+        {
+            "id": 2,
+            "name": "The North Pole - The North Pole",
+            "description": "The main location of this years KringleCon and FrostFest. At the left side you can see the KringleCon building, at the right side there is the Frostfest tower.",
+            "image": "room02"
         }
     ],
     "objectives": [
@@ -14,6 +20,13 @@
             "description": "an Elf standing next to a Terminal",
             "image": "objective01",
             "location": 1
+        }
+    ],
+    "junctions": [
+        {
+            "id": 1,
+            "destination": 2,
+            "description": "In front of you"
         }
     ]
 }
