@@ -254,11 +254,11 @@ def display_image(image_name):
 
 # parses the JSON based configuration file and creature objects from that configuration, requires json
 def load_data():
-    global outputs
     global settings
 
     f = open("data.json")
     data = json.load(f)
+    settings = data["settings"]
     for i in data["rooms"]:
         room = Room()
         room.name = i["name"]
@@ -279,10 +279,6 @@ def load_data():
         junction.location = i["location"]
         junctions.update({i["id"]: junction})
     f.close()
-
-    s = open("settings.json")
-    settings = json.load(s)
-    s.close()
 
 # queries the user to enter a command and triggers the matching function
 def query_user():
