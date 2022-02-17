@@ -2,19 +2,20 @@ import os       # necessary to access terminal size
 import json     # necessary to read json-based data file
 import readline # necessary to be able to auto-complete user
 
-from Object import Object
 from Room import Room
 from Objective import Objective
 from Junction import Junction
 
-cont = 1        # the program will run until this value is set to 0
-location = 1    # the starting room always has ID 1, changes later in the game by walking around
-rows = 24       # default terminal heigth
-columns = 80    # default terminal width, necessary to render ansii images
+cont = 1                # the program will run until this value is set to 0
+location = 1            # the starting room always has ID 1, changes later in the game by walking around
+rows = 24               # default terminal heigth
+columns = 80            # default terminal width, necessary to render ansii images
 
 rooms = dict()          # contains all available rooms
 objectives = dict()     # contains all available objectives
 junctions = dict()      # contains all junctions between the rooms
+
+settings = dict()       # holds all game settings
 
 volcab = []             # contains autocomplete values
 default_actions = ['help','cry','beam','exit','inspect','look','meditate','scrutinize','talk','phone','quit','walk'] # default actions
@@ -25,8 +26,10 @@ default_actions = ['help','cry','beam','exit','inspect','look','meditate','scrut
 # all the actions the player can perform
 # only triggered once automatically when the player arrives (starts the program) - no command assigned
 def arrive():
-    print ("You are arriving at a strange and unknown location.")
-    print ("You are feeling a little dizzy.")
+    display_image(settings["logo"])
+    print("")
+    print("You are arriving at a strange and unknown location.")
+    print("You are feeling a little dizzy.")
     rooms.get(location).visited = True
 
 # get some about information - "scrutinize" command assigned
@@ -71,7 +74,6 @@ def inspect():
 def meditate():
     print("A quest to save Santa has brought you to this place.")
     print("You think about all those creatures here could help you.")
-    print("It may also be a good idea to visit other places.")
 
 # have a quick look at this place - "look" command assigned
 def look():
@@ -252,6 +254,9 @@ def display_image(image_name):
 
 # parses the JSON based configuration file and creature objects from that configuration, requires json
 def load_data():
+    global outputs
+    global settings
+
     f = open("data.json")
     data = json.load(f)
     for i in data["rooms"]:
@@ -274,6 +279,10 @@ def load_data():
         junction.location = i["location"]
         junctions.update({i["id"]: junction})
     f.close()
+
+    s = open("settings.json")
+    settings = json.load(s)
+    s.close()
 
 # queries the user to enter a command and triggers the matching function
 def query_user():

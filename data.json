@@ -1,4 +1,8 @@
 {
+    "settings": 
+    {
+        "logo": "logo"
+    },
     "rooms": [
         {
             "id": 1,
