@@ -7,14 +7,12 @@
         {
             "id": 1,
             "name": "The_North_Pole_-_Orientation",
-            "description": "This is the entry point to this years KringleCon. In front of you you can see a green fence.",
-            "image": "room01"
+            "description": "This is the entry point to this years KringleCon. In front of you you can see a green fence."
         },
         {
             "id": 2,
             "name": "The_North_Pole_-_The_North_Pole",
-            "description": "The main location of this years KringleCon and FrostFest. At the left side you can see the KringleCon building, at the right side there is the Frostfest tower.",
-            "image": "room02"
+            "description": "The main location of this years KringleCon and FrostFest. At the left side you can see the KringleCon building, at the right side there is the Frostfest tower."
         }
     ],
     "objectives": [
@@ -22,7 +20,6 @@
             "id": 1,
             "name": "Jingle_Ringford",
             "description": "an Elf standing next to a Terminal",
-            "image": "objective01",
             "location": 1,
             "difficulty": 1
         }

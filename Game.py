@@ -78,7 +78,7 @@ def meditate():
 # have a quick look at this place - "look" command assigned
 def look():
     print("You are currently at " + rooms.get(location).name + " and admiring what your eyes can see...")
-    display_image(rooms.get(location).image)
+    display_image("room_" + str(location))
     print(rooms.get(location).description)
 
 # phone other creatures you already have discovered - "phone" command assigned
@@ -107,7 +107,7 @@ def phone():
             if (objectives[id].visited):
                 if (objectives[id].name == talk):
                     print("You are talking to " + objectives[id].name)
-                    display_image(objectives[id].image)
+                    display_image("objective_" + str(id))
                     break
                 else:
                     print("You decide you don't want to talk right now.")
@@ -138,7 +138,7 @@ def talk():
             if (objectives[id].location == location):
                 if (objectives[id].name == talk):
                     print("You are talking to " + objectives[id].name)
-                    display_image(objectives[id].image)
+                    display_image("objective_" + str(id))
                     objectives[id].visited = True
                     break
                 else:
@@ -263,13 +263,11 @@ def load_data():
         room = Room()
         room.name = i["name"]
         room.description = i["description"]
-        room.image = i["image"]
         rooms.update({i["id"]: room})
     for i in data["objectives"]:
         objective = Objective()
         objective.name = i["name"]
         objective.description = i["description"]
-        objective.image = i["image"]
         objective.location = i["location"]
         objectives.update({i["id"]: objective})
     for i in data["junctions"]:
