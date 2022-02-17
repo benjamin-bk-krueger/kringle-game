@@ -19,7 +19,13 @@ class Object:
         self.__description = description
     def get_description(self):
         return self.__description
+
+    def set_location(self, location):
+        self.__location = location
+    def get_location(self):
+        return self.__location
     
     visited = property(get_visited, set_visited)
     name = property(get_name, set_name)
     description = property(get_description, set_description)
+    location = property(get_location, set_location)

@@ -1,6 +1,7 @@
-import os       # necessary to access terminal size
-import json     # necessary to read json-based data file
-import readline # necessary to be able to auto-complete user
+import os           # necessary to access terminal size
+import json         # necessary to read json-based data file
+import readline     # necessary to be able to auto-complete user
+import webbrowser   # necessary to display web pages
 
 from rich.console import Console    # necessary for markdown display
 from rich.markdown import Markdown  # necessary for markdown display
@@ -18,8 +19,6 @@ rooms = dict()          # contains all available rooms
 objectives = dict()     # contains all available objectives
 junctions = dict()      # contains all junctions between the rooms
 
-settings = dict()       # holds all game settings
-
 volcab = []             # contains autocomplete values
 default_actions = ['help','cry','beam','exit','inspect','look','meditate','scrutinize','talk','phone','quit','walk'] # default actions
 
@@ -31,7 +30,7 @@ console = Console()     # markdown output to console
 # all the actions the player can perform
 # only triggered once automatically when the player arrives (starts the program) - no command assigned
 def arrive():
-    display_image(settings["logo"])
+    display_image("logo")
     print("")
     print("You are arriving at a strange and unknown location.")
     print("You are feeling a little dizzy.")
@@ -111,8 +110,8 @@ def phone():
         for id in objectives:
             if (objectives[id].visited):
                 if (objectives[id].name == talk):
-                    print("You are talking to " + objectives[id].name)
-                    display_image("objective_" + str(id))
+                    objectives[id].visited = True
+                    talk_to(id, objectives[id].name, objectives[id].url)
                     break
                 else:
                     print("You decide you don't want to talk right now.")
@@ -142,17 +141,8 @@ def talk():
         for id in objectives:
             if (objectives[id].location == location):
                 if (objectives[id].name == talk):
-                    print("You are talking to " + objectives[id].name)
-                    display_image("objective_" + str(id))
                     objectives[id].visited = True
-
-                    print("")
-                    print(objectives[id].name + " gives you following quest:")
-                    display_markdown("objective_" + str(id) + "_q")
-
-                    print("")
-                    print("After a short while " + objectives[id].name + " also offers you the solution:")
-                    display_markdown("objective_" + str(id) + "_a")
+                    talk_to(id, objectives[id].name, objectives[id].url)
                     break
                 else:
                     print("You decide you don't want to talk right now.")
@@ -249,6 +239,34 @@ def set_custom_complete(list):
     global volcab
     volcab = list
 
+# basic yes no question
+def yesno():
+    answer = input("You are saying yes or no > ")
+    if (answer == "yes" or answer == "y"):
+        return True
+    else:
+        return False
+
+# talk to a creature
+def talk_to(id, name, url):
+    print("You are talking to " + name)
+    display_image("objective_" + str(id))
+
+    print("")
+    print(name + " gives you following quest:")
+    display_markdown("objective_" + str(id) + "_q")
+                    
+    print("")
+    print(name + " asks you if you want to open this quest.")
+    if (yesno()):
+        webbrowser.open(url, new=1)
+
+    print("")
+    print("After a short while " + name + " also offers you the solution.")
+    print("Do you want to hear it?")
+    if (yesno()):
+        display_markdown("objective_" + str(id) + "_a")
+
 # auto-completion with Python readline, requires readline
 def complete(text,state):
     results = [x for x in volcab if x.startswith(text)] + [None]
@@ -273,28 +291,34 @@ def display_markdown(md_name):
 
 # parses the JSON based configuration file and creature objects from that configuration, requires json
 def load_data():
-    global settings
-
+    counter_r = 1
+    counter_o = 1
+    counter_j = 1
     f = open("data.json")
     data = json.load(f)
-    settings = data["settings"]
     for i in data["rooms"]:
         room = Room()
         room.name = i["name"]
         room.description = i["description"]
-        rooms.update({i["id"]: room})
+        room.location = i["location"]
+        rooms.update({counter_r: room})
+        counter_r = counter_r + 1
     for i in data["objectives"]:
         objective = Objective()
         objective.name = i["name"]
         objective.description = i["description"]
         objective.location = i["location"]
-        objectives.update({i["id"]: objective})
+        objective.difficulty = i["difficulty"]
+        objective.url = i["url"]
+        objectives.update({counter_o: objective})
+        counter_o = counter_o + 1
     for i in data["junctions"]:
         junction = Junction()
         junction.destination = i["destination"]
         junction.description = i["description"]
         junction.location = i["location"]
-        junctions.update({i["id"]: junction})
+        junctions.update({counter_j: junction})
+        counter_j = counter_j + 1
     f.close()
 
 # queries the user to enter a command and triggers the matching function

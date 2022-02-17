@@ -1,41 +1,35 @@
 {
-    "settings": 
-    {
-        "logo": "logo"
-    },
     "rooms": [
         {
-            "id": 1,
+            "location": 1,
             "name": "The_North_Pole_-_Orientation",
             "description": "This is the entry point to this years KringleCon. In front of you you can see a green fence."
         },
         {
-            "id": 2,
+            "location": 2,
             "name": "The_North_Pole_-_The_North_Pole",
             "description": "The main location of this years KringleCon and FrostFest. At the left side you can see the KringleCon building, at the right side there is the Frostfest tower."
         }
     ],
     "objectives": [
         {
-            "id": 1,
+            "location": 1,
             "name": "Jingle_Ringford",
             "description": "an Elf standing next to a Terminal",
-            "location": 1,
-            "difficulty": 1
+            "difficulty": 1,
+            "url": "https://docker2021.kringlecon.com/?challenge=opengate&id=898f4faf-fa0f-4494-9875-32e39cd5c371&username=Test&area=staging&location=6,4"
         }
     ],
     "junctions": [
         {
-            "id": 1,
+            "location": 1,
             "destination": 2,
-            "description": "In front of you",
-            "location": 1
+            "description": "In front of you"
         },
         {
-            "id": 2,
+            "location": 2,
             "destination": 1,
-            "description": "Behind of you",
-            "location": 2
+            "description": "Behind of you"
         }
     ]
 }
