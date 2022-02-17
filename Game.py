@@ -2,6 +2,9 @@ import os       # necessary to access terminal size
 import json     # necessary to read json-based data file
 import readline # necessary to be able to auto-complete user
 
+from rich.console import Console    # necessary for markdown display
+from rich.markdown import Markdown  # necessary for markdown display
+
 from Room import Room
 from Objective import Objective
 from Junction import Junction
@@ -19,6 +22,8 @@ settings = dict()       # holds all game settings
 
 volcab = []             # contains autocomplete values
 default_actions = ['help','cry','beam','exit','inspect','look','meditate','scrutinize','talk','phone','quit','walk'] # default actions
+
+console = Console()     # markdown output to console
 
 # ANSII images have been created with the help of https://manytools.org/hacker-tools/convert-image-to-ansi-art/
 # size formats: 80, 160 characters (s, m format)
@@ -140,6 +145,14 @@ def talk():
                     print("You are talking to " + objectives[id].name)
                     display_image("objective_" + str(id))
                     objectives[id].visited = True
+
+                    print("")
+                    print(objectives[id].name + " gives you following quest:")
+                    display_markdown("objective_" + str(id) + "_q")
+
+                    print("")
+                    print("After a short while " + objectives[id].name + " also offers you the solution:")
+                    display_markdown("objective_" + str(id) + "_a")
                     break
                 else:
                     print("You decide you don't want to talk right now.")
@@ -252,6 +265,12 @@ def display_image(image_name):
         img = open("images/" + image_name + "_m.ans", "r")
         print(img.read())
 
+# displays a markdown page
+def display_markdown(md_name):
+    f = open("quests/" + md_name + ".md","r")
+    md = Markdown(f.read())
+    console.print(md)
+
 # parses the JSON based configuration file and creature objects from that configuration, requires json
 def load_data():
     global settings
@@ -337,3 +356,4 @@ while (cont == 1):
     rows = int(s_rows)
     columns = int(s_columns)
     query_user()
+    
