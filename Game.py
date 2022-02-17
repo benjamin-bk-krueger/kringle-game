@@ -324,6 +324,11 @@ set_default_complete()
 readline.parse_and_bind ("bind ^I rl_complete") # Mac
 readline.set_completer(complete)
 
+# get terminal size
+s_rows, s_columns = os.popen('stty size', 'r').read().split()
+rows = int(s_rows)
+columns = int(s_columns)
+
 # open the JSON data file and build all object dictionnaries
 load_data()
 
@@ -333,6 +338,7 @@ print("")
 meditate()
 
 while (cont == 1):
+    # get terminal size - maybe the user has resized the window
     s_rows, s_columns = os.popen('stty size', 'r').read().split()
     rows = int(s_rows)
     columns = int(s_columns)
