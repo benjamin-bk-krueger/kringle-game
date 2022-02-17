@@ -246,10 +246,10 @@ def display_image(image_name):
     if (columns < 80):
         print("...but your view space is too small to see all the details.")
     elif (columns >= 80 and columns < 160):
-        img = open("res/" + image_name + "_s.ans", "r")
+        img = open("images/" + image_name + "_s.ans", "r")
         print(img.read())
     else:
-        img = open("res/" + image_name + "_m.ans", "r")
+        img = open("images/" + image_name + "_m.ans", "r")
         print(img.read())
 
 # parses the JSON based configuration file and creature objects from that configuration, requires json
