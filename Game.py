@@ -357,8 +357,8 @@ def query_user():
 # -------------------------
 # sets default for command auto-completion
 set_default_complete()
-#readline.parse_and_bind("tab: complete") # Linux
-readline.parse_and_bind ("bind ^I rl_complete") # Mac
+readline.parse_and_bind("tab: complete") # Linux
+#readline.parse_and_bind ("bind ^I rl_complete") # Mac
 readline.set_completer(complete)
 
 # get terminal size
