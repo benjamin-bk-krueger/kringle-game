@@ -6,9 +6,9 @@ import webbrowser   # necessary to display web pages
 from rich.console import Console    # necessary for markdown display
 from rich.markdown import Markdown  # necessary for markdown display
 
-from Room import Room
-from Objective import Objective
-from Junction import Junction
+from room import Room
+from objective import Objective
+from junction import Junction
 
 cont = 1                # the program will run until this value is set to 0
 location = 1            # the starting room always has ID 1, changes later in the game by walking around
@@ -273,8 +273,10 @@ def display_image(image_name):
         f = open("images/" + image_name + ".jpg")
         os.system("jp2a " + "images/" + image_name + ".jpg --colors --fill --color-depth=8")
         f.close()
+        return (True)
     except IOError:
         print("Image file not found for " + image_name)
+        return (False)
 
 # displays a markdown page
 def display_markdown(md_name):
@@ -313,6 +315,7 @@ def load_data():
         junctions.update({counter_j: junction})
         counter_j = counter_j + 1
     f.close()
+    return (counter_r - 1 + counter_o - 1 + counter_j -1)
 
 # queries the user to enter a command and triggers the matching function
 def query_user():
@@ -354,14 +357,16 @@ readline.parse_and_bind("tab: complete") # Linux
 #readline.parse_and_bind ("bind ^I rl_complete") # Mac
 readline.set_completer(complete)
 
-# open the JSON data file and build all object dictionnaries
-load_data()
+if __name__ == '__main__':
+    # open the JSON data file and build all object dictionnaries
+    load_data()
 
-# start the game until the player decides to quit
-arrive()
-print("")
-meditate()
+    # start the game until the player decides to quit
+    arrive()
+    print("")
+    meditate()
 
-while (cont == 1):
-    query_user()
-    
+    while (cont == 1):
+        query_user()
+else:
+    print(f"Cannot be run as module import: {__name__}")

@@ -1,4 +1,4 @@
-from Object import Object
+from object import Object
 
 class Room(Object):
     """

@@ -1,6 +1,9 @@
 FROM ubuntu
 
-MAINTAINER Ben Krueger <sayhello@blk.pm> version: 0.1
+LABEL version="0.1"
+LABEL maintaner="Ben Krueger <sayhello@blk.pm>"
+#LABEL release-date="2020-04-05"
+#LABEL promoted="true"
 
 RUN apt-get update
 RUN apt-get install -y libncurses-dev flex libssl-dev libelf-dev bc bison
