@@ -1,2 +1,2 @@
 #!/bin/sh
-docker run -it kringlecon
+docker run -p 3000:3000 -it kringlecon
