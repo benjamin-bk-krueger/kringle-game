@@ -12,8 +12,6 @@ from Junction import Junction
 
 cont = 1                # the program will run until this value is set to 0
 location = 1            # the starting room always has ID 1, changes later in the game by walking around
-rows = 24               # default terminal heigth
-columns = 80            # default terminal width, necessary to render ansii images
 
 rooms = dict()          # contains all available rooms
 objectives = dict()     # contains all available objectives
@@ -23,9 +21,6 @@ volcab = []             # contains autocomplete values
 default_actions = ['help','cry','beam','exit','inspect','look','meditate','scrutinize','talk','phone','quit','walk'] # default actions
 
 console = Console()     # markdown output to console
-
-# ANSII images have been created with the help of https://manytools.org/hacker-tools/convert-image-to-ansi-art/
-# size formats: 80, 160 characters (s, m format)
 
 # all the actions the player can perform
 # only triggered once automatically when the player arrives (starts the program) - no command assigned
@@ -272,16 +267,14 @@ def complete(text,state):
     results = [x for x in volcab if x.startswith(text)] + [None]
     return results[state]
 
-# displays a colored ANSII image, depending on the terminal size, requires os
+# displays a colored ANSII image, depending on the terminal size, requires external program
 def display_image(image_name):
-    if (columns < 80):
-        print("...but your view space is too small to see all the details.")
-    elif (columns >= 80 and columns < 160):
-        img = open("images/" + image_name + "_s.ans", "r")
-        print(img.read())
-    else:
-        img = open("images/" + image_name + "_m.ans", "r")
-        print(img.read())
+    try:
+        f = open("images/" + image_name + ".jpg")
+        os.system("jp2a " + "images/" + image_name + ".jpg --colors --fill --color-depth=8")
+        f.close()
+    except IOError:
+        print("Image file not found for " + image_name)
 
 # displays a markdown page
 def display_markdown(md_name):
@@ -361,11 +354,6 @@ readline.parse_and_bind("tab: complete") # Linux
 #readline.parse_and_bind ("bind ^I rl_complete") # Mac
 readline.set_completer(complete)
 
-# get terminal size
-s_rows, s_columns = os.popen('stty size', 'r').read().split()
-rows = int(s_rows)
-columns = int(s_columns)
-
 # open the JSON data file and build all object dictionnaries
 load_data()
 
@@ -375,9 +363,5 @@ print("")
 meditate()
 
 while (cont == 1):
-    # get terminal size - maybe the user has resized the window
-    s_rows, s_columns = os.popen('stty size', 'r').read().split()
-    rows = int(s_rows)
-    columns = int(s_columns)
     query_user()
     

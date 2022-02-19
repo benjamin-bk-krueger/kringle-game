@@ -5,6 +5,7 @@ MAINTAINER Ben Krueger <sayhello@blk.pm> version: 0.1
 RUN apt-get update
 RUN apt-get install -y python3
 RUN apt-get install -y python3-pip
+RUN apt-get install -y jp2a
 RUN apt-get clean
 RUN rm -rf /var/lib/apt/lists/*
 
@@ -22,4 +23,4 @@ COPY quests/* /home/game/quests/
 COPY *.md /home/game/
 COPY LICENSE /home/game/
 
-CMD ["/home/game/run.sh"]  
+CMD ["/home/game/game.sh"]  
