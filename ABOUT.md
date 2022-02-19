@@ -69,3 +69,10 @@ I don't know if I can keep this pace but instead of watching stupid serials on T
 I got a working Docker container but for someone without a Docker installation the program cannot be used. It can be installed on a server and be accessed via SSH but maybe it's easier just to access the game using a web browser. The original game is using WeTTY. Why not use that one as well? Having some difficulties building WeTTY from sources but at the end I was successful. Modified the Docker container so WeTTY gets started when the container is running. Writing encryption (HTTPS, reverse proxy) on my todo list...
 
 Started writing unit test cases...
+
+Managed to trigger automatic code builds via GitHub Actions. My action is taking the code, building a Docker image and deploying it do Docker Hub at the end. No need to build anything locally anymore. 
+
+Now I do have a really cool code pipeline. I can edit the code - as soon as I commit the changes to the GitHub repo I'll get a Docker image a few minutes afterwards in my Docker repository. A next step may be to deploy that image on some server, maybe some AWS service and host the container there. Enough infrastructure stuff for the moment. Guess I'll focus on the game itself again. 
+
+WEEKEND TIME!!!
+
