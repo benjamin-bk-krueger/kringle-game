@@ -1,2 +1,2 @@
 #!/bin/sh
-docker build -t kringlecon -f docker-files/Dockerfile .
+docker build -t benjaminkrueger/2022-kringlecon -f docker-files/Dockerfile .
