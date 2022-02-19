@@ -28,4 +28,5 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: ${{ github.repository }}:${{ steps.vars.outputs.tag }}
+          # tags: ${{ github.repository }}:${{ steps.vars.outputs.tag }}
+          tags: benjaminkrueger/2022-kringlecon:${{ steps.vars.outputs.tag }}
