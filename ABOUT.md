@@ -53,6 +53,7 @@ Created some bash scripts to automate things: building a Docker container, runni
 Tested my shiny Docker container both on MacOS and Linux
 
 ***2022-02-19***
+
 I don't feel confident creating all the ASCII images using a web tool anymore. Seems to be a lot of work and includes a lot of manual steps. There is a tool called JP2A which is able to read JPEG files and render ASCII art. There is no real Python implementation but I guess it's okay to rely on that external tool. Adding it to the Docker container is very simple. This way it doesn't matter if the user has the tool installed or not.
 Python is powerful, Docker is powerful, I'm feeling powerful!
 
@@ -62,3 +63,8 @@ Just set up a GitHub projects site to keep track of my tasks and ideas
 A week is over and I feel like I really have achieved something. I have a small basic interactive game which supports configurable game data and can be launched anywhere using containerization. 
 
 I don't know if I can keep this pace but instead of watching stupid serials on TV I'll want to invest at least a few hours each week to continue this journey. Let's see where it will end ...
+
+***2022-02-19 (late evening)***
+
+I got a working Docker container but for someone without a Docker installation the program cannot be used. It can be installed on a server and be accessed via SSH but maybe it's easier just to access the game using a web browser. The original game is using WeTTY. Why not use that one as well? Having some difficulties building WeTTY from sources but at the end I was successful. Modified the Docker container so WeTTY gets started when the container is running. Writing encryption (HTTPS, reverse proxy) on my todo list...
+
