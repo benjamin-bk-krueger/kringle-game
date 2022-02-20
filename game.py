@@ -270,8 +270,8 @@ def complete(text,state):
 # displays a colored ANSII image, depending on the terminal size, requires external program
 def display_image(image_name):
     try:
-        f = open("images/" + image_name + ".jpg")
-        os.system("jp2a " + "images/" + image_name + ".jpg --colors --fill --color-depth=8")
+        f = open("images/" + image_name + ".jpg","r")
+        os.system("/bin/jp2a " + "images/" + image_name + ".jpg --colors --fill --color-depth=8")
         f.close()
         return (True)
     except IOError:
@@ -280,9 +280,15 @@ def display_image(image_name):
 
 # displays a markdown page
 def display_markdown(md_name):
-    f = open("quests/" + md_name + ".md","r")
-    md = Markdown(f.read())
-    console.print(md)
+    try:
+        f = open("quests/" + md_name + ".md","r")
+        md = Markdown(f.read())
+        console.print(md)
+        f.close()
+        return (True)
+    except IOError:
+        print("Image file not found for " + md_name)
+        return (False)
 
 # parses the JSON based configuration file and creature objects from that configuration, requires json
 def load_data():
