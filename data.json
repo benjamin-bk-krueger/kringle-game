@@ -15,9 +15,26 @@
         {
             "location": 1,
             "name": "JingleRingford",
-            "description": "an Elf standing next to a Terminal",
+            "description": "an Elf standing next to a Terminal for \"Objective 1 - KringleCon Orientation\"",
             "difficulty": 1,
-            "url": "https://docker2021.kringlecon.com/?challenge=opengate&id=898f4faf-fa0f-4494-9875-32e39cd5c371&username=Test&area=staging&location=6,4"
+            "url": "https://docker2021.kringlecon.com/?challenge=opengate&id=898f4faf-fa0f-4494-9875-32e39cd5c371&username=Test&area=staging&location=6,4",
+            "supports": "main"
+        },
+        {
+            "location": 2,
+            "name": "GreasyGopherGuts",
+            "description": "a Troll standing next to a Terminal called \"Greping for Gold\"",
+            "difficulty": 1,
+            "url": "tbd",
+            "supports": "JingleRingford"
+        },
+        {
+            "location": 2,
+            "name": "NoelBoetie",
+            "description": "an Elf standing next to a Terminal called \"Logic Munchers\"",
+            "difficulty": 1,
+            "url": "tbd",
+            "supports": "JingleRingford"
         }
     ],
     "junctions": [

@@ -45,22 +45,28 @@ def lost():
 def help():
     print("A magical voice whispers into your ear: \"Following commands are available\"")
     print(default_actions)
+    print("")
     print("Then it whispers: \"TAB is your friend\"")
     print("You wonder what this TAB may be? A creature? A scroll?")
 
 # have a detailed look what kind of objects a room contains - "inspect" command assigned
 def inspect():
     print("You are inspecting the place and looking for further objects you can interact with...")
+    print("")
 
     for id in objectives:
         if (objectives[id].location == location):
             print("In this room you can see " + objectives[id].name + ", " + objectives[id].description + ".")
-            print("    " + objectives[id].name + " seems to know something about a main objective.")
+            if (objectives[id].supports == "main"):
+                print("    " + objectives[id].name + " seems to know something about a main objective.")
+            else:
+                print("    " + objectives[id].name + " can you give some hints for the quest " + objectives[id].supports + " is offering.")
             if (objectives[id].visited):
                 print("    " + "You already have talked to " + objectives[id].name + " before.")
             else:
                 print("    " + "You have not talked to " + objectives[id].name + " yet.")
-    
+            print("")
+
     for id in junctions:
         if (junctions[id].location == location):
             print(junctions[id].description + " you can see a junction to " + rooms.get(junctions[id].destination).name)
@@ -68,6 +74,7 @@ def inspect():
                 print ("    " + "You have visited that location already.")
             else:
                 print ("    " + "You have not seen that location yet.")
+            print("")
 
 # think about the main quest in the game, triggered automatically when the player arrives - "meditate" command assigned
 def meditate():
@@ -77,7 +84,9 @@ def meditate():
 # have a quick look at this place - "look" command assigned
 def look():
     print("You are currently at " + rooms.get(location).name + " and admiring what your eyes can see...")
-    display_image("room_" + str(location))
+    print("")
+    display_image(rooms.get(location).name)
+    print("")
     print(rooms.get(location).description)
 
 # phone other creatures you already have discovered - "phone" command assigned
@@ -89,6 +98,7 @@ def phone():
     print("You put your hand into your right pocket and grab a magical device.")
     print("It has a display where you can see the names of all the creatures you had contact with.")
     print("You guess you can open some channel to a creature by tapping its name.")
+    print("")
 
     # assign all visited creatures to the auto-completion list
     counter = 0
@@ -106,12 +116,14 @@ def phone():
             if (objectives[id].visited):
                 if (objectives[id].name == talk):
                     objectives[id].visited = True
-                    talk_to(id, objectives[id].name, objectives[id].url)
+                    talk_to(objectives[id].name, objectives[id].url)
                     break
                 else:
+                    print("")
                     print("You decide you don't want to talk right now.")
                     break
     else:
+        print("")
         print("After a moment you realize you have not met anyone yet.")
     set_default_complete()
     
@@ -137,12 +149,14 @@ def talk():
             if (objectives[id].location == location):
                 if (objectives[id].name == talk):
                     objectives[id].visited = True
-                    talk_to(id, objectives[id].name, objectives[id].url)
+                    talk_to(objectives[id].name, objectives[id].url)
                     break
                 else:
+                    print("")
                     print("You decide you don't want to talk right now.")
                     break
     else:
+        print("")
         print("After a moment you realize no one is in this room.")
     set_default_complete()
 
@@ -156,6 +170,7 @@ def beam():
     print("You put your hand into your left pocket and grab a magical device.")
     print("It has a display where you can see the names of all the places you have visited.")
     print("You guess you can travel there by tapping its name.")
+    print("")
 
     # assign all visited rooms to the auto-completion list
     counter = 0
@@ -173,15 +188,18 @@ def beam():
         for id in rooms:
             if (rooms[id].visited):
                 if (rooms[id].name == walk):
+                    print("")
                     print("You are going to " + rooms[id].name)
                     new_location = id
                     break
                 else:
                     new_location = location
+                    print("")
                     print("You decide to stay where you currently are.")
                     break
     else:
         new_location = location
+        print("")
         print("After a moment you realize you have not been anywhere yet.")
     location = new_location
     set_default_complete()
@@ -209,17 +227,20 @@ def walk():
         for id in junctions:
             if (junctions[id].location == location):
                 if (rooms.get(junctions[id].destination).name == walk):
+                    print("")
                     print("You are going to " + rooms.get(junctions[id].destination).name)
                     new_location = junctions[id].destination
                     rooms.get(junctions[id].destination).visited = True
                     break
                 else:
                     new_location = location
+                    print("")
                     print("You decide to stay where you currently are.")
                     break
     else:
         new_location = location
-        "After a moment you realize there is no way out of this room."
+        print("")
+        print("After a moment you realize there is no way out of this room.")
     location = new_location
     set_default_complete()
 
@@ -243,13 +264,13 @@ def yesno():
         return False
 
 # talk to a creature
-def talk_to(id, name, url):
+def talk_to(name, url):
     print("You are talking to " + name)
-    display_image("objective_" + str(id))
+    display_image(name)
 
     print("")
     print(name + " gives you following quest:")
-    display_markdown("objective_" + str(id) + "_q")
+    display_markdown(name + "_q")
                     
     print("")
     print(name + " asks you if you want to open this quest.")
@@ -260,7 +281,7 @@ def talk_to(id, name, url):
     print("After a short while " + name + " also offers you the solution.")
     print("Do you want to hear it?")
     if (yesno()):
-        display_markdown("objective_" + str(id) + "_a")
+        display_markdown(name + "_a")
 
 # auto-completion with Python readline, requires readline
 def complete(text,state):
@@ -287,7 +308,7 @@ def display_markdown(md_name):
         f.close()
         return (True)
     except IOError:
-        print("Image file not found for " + md_name)
+        print("Markdown file not found for " + md_name)
         return (False)
 
 # parses the JSON based configuration file and creature objects from that configuration, requires json
@@ -311,6 +332,7 @@ def load_data():
         objective.location = i["location"]
         objective.difficulty = i["difficulty"]
         objective.url = i["url"]
+        objective.supports = i["supports"]
         objectives.update({counter_o: objective})
         counter_o = counter_o + 1
     for i in data["junctions"]:
@@ -328,6 +350,7 @@ def query_user():
     global cont
     print("")
     cmd = input("I want to > ")
+    print("")
     if (cmd == "help"):
         help()
     elif (cmd == "cry"):
