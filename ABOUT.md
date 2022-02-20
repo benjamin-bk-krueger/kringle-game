@@ -76,3 +76,9 @@ Now I do have a really cool code pipeline. I can edit the code - as soon as I co
 
 WEEKEND TIME!!!
 
+***2022-02-20***
+
+Quickly ran the Docker container on a small AWS EC2 instance. Proof of Concept: Successful!!
+Bought a book covering Python...
+Next week I'll join a bootcamp "GitHub for Everyone" hosted by INE. I'm sure I'll learn a lot of things. 
+Guess setting up something like Kubernetes won't be so easy ... INE also has a lot of courses covering that 
