@@ -16,7 +16,13 @@ class Objective(Object):
         self.__supports = supports
     def get_supports(self):
         return self.__supports
+    def set_requires(self, requires):
+        self.__requires = requires
+    def get_requires(self):
+        return self.__requires
+    
     
     difficulty = property(get_difficulty, set_difficulty)
     url = property(get_url, set_url)
     supports = property(get_supports, set_supports)
+    requires = property(get_requires, set_requires)

@@ -18,7 +18,8 @@
             "description": "an Elf standing next to a Terminal for \"Objective 1 - KringleCon Orientation\"",
             "difficulty": 1,
             "url": "https://docker2021.kringlecon.com/?challenge=opengate&id=898f4faf-fa0f-4494-9875-32e39cd5c371&username=Test&area=staging&location=6,4",
-            "supports": "main"
+            "supports": "main",
+            "requires": "WiFiDongle"
         },
         {
             "location": 2,
@@ -26,7 +27,8 @@
             "description": "a Troll standing next to a Terminal called \"Greping for Gold\"",
             "difficulty": 1,
             "url": "tbd",
-            "supports": "JingleRingford"
+            "supports": "JingleRingford",
+            "requires": "none"
         },
         {
             "location": 2,
@@ -34,7 +36,8 @@
             "description": "an Elf standing next to a Terminal called \"Logic Munchers\"",
             "difficulty": 1,
             "url": "tbd",
-            "supports": "JingleRingford"
+            "supports": "JingleRingford",
+            "requires": "none"
         }
     ],
     "junctions": [
@@ -47,6 +50,13 @@
             "location": 2,
             "destination": 1,
             "description": "Behind of you"
+        }
+    ],
+    "items": [
+        {
+            "location": 1,
+            "name": "WiFiDongle",
+            "description": "A USB WiFi dongle"
         }
     ]
 }

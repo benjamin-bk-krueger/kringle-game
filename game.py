@@ -9,6 +9,7 @@ from rich.markdown import Markdown  # necessary for markdown display
 from room import Room
 from objective import Objective
 from junction import Junction
+from item import Item
 
 cont = 1                # the program will run until this value is set to 0
 location = 1            # the starting room always has ID 1, changes later in the game by walking around
@@ -16,9 +17,10 @@ location = 1            # the starting room always has ID 1, changes later in th
 rooms = dict()          # contains all available rooms
 objectives = dict()     # contains all available objectives
 junctions = dict()      # contains all junctions between the rooms
+items = dict()          # contains all available items
 
 volcab = []             # contains autocomplete values
-default_actions = ['help','cry','beam','exit','inspect','look','meditate','scrutinize','talk','phone','quit','walk'] # default actions
+default_actions = ['beam','cry','exit','grab','help','inspect','look','meditate','phone','quit','recap','scrutinize','talk','walk'] # default actions
 
 console = Console()     # markdown output to console
 
@@ -35,7 +37,7 @@ def arrive():
 def scrutinize():
     print("A magical voice whispers into your ear:")
     print("\"This game has been created by Ben Krueger\"")
-    print("You wonder what this may mean? A game? Strange thought")
+    print("You wonder what this may mean? You are in a game? Strange thought indeed!")
 
 # triggered automatically when the player enters a wrong command - no command assigned
 def lost():
@@ -67,6 +69,12 @@ def inspect():
                 print("    " + "You have not talked to " + objectives[id].name + " yet.")
             print("")
 
+    for id in items:
+        if (items[id].location == location):
+            if (not items[id].visited):
+                print("In a corner you can see a " + items[id].name + " lying around. You guess it's a " + items[id].description + ".")
+                print("")
+
     for id in junctions:
         if (junctions[id].location == location):
             print(junctions[id].description + " you can see a junction to " + rooms.get(junctions[id].destination).name)
@@ -79,7 +87,7 @@ def inspect():
 # think about the main quest in the game, triggered automatically when the player arrives - "meditate" command assigned
 def meditate():
     print("A quest to save Santa has brought you to this place.")
-    print("You think about all those creatures here could help you.")
+    print("You think about how all those creatures here could help you.")
 
 # have a quick look at this place - "look" command assigned
 def look():
@@ -102,6 +110,7 @@ def phone():
 
     # assign all visited creatures to the auto-completion list
     counter = 0
+    have_talked = False
     for id in objectives:
         if (objectives[id].visited):
             counter = counter + 1
@@ -117,13 +126,12 @@ def phone():
                 if (objectives[id].name == talk):
                     objectives[id].visited = True
                     talk_to(objectives[id].name, objectives[id].url)
+                    have_talked = True
                     break
-                else:
-                    print("")
-                    print("You decide you don't want to talk right now.")
-                    break
+        if (not have_talked):
+            print("")
+            print("You decide you don't want to talk right now.")
     else:
-        print("")
         print("After a moment you realize you have not met anyone yet.")
     set_default_complete()
     
@@ -135,6 +143,7 @@ def talk():
 
     # assign all creatures in this room to the auto-completion list
     counter = 0
+    have_talked = False
     for id in objectives:
         if (objectives[id].location == location):
             counter = counter + 1
@@ -150,13 +159,12 @@ def talk():
                 if (objectives[id].name == talk):
                     objectives[id].visited = True
                     talk_to(objectives[id].name, objectives[id].url)
+                    have_talked = True
                     break
-                else:
-                    print("")
-                    print("You decide you don't want to talk right now.")
-                    break
+        if (not have_talked):
+            print("")
+            print("You decide you don't want to talk right now.")
     else:
-        print("")
         print("After a moment you realize no one is in this room.")
     set_default_complete()
 
@@ -199,7 +207,6 @@ def beam():
                     break
     else:
         new_location = location
-        print("")
         print("After a moment you realize you have not been anywhere yet.")
     location = new_location
     set_default_complete()
@@ -239,11 +246,62 @@ def walk():
                     break
     else:
         new_location = location
-        print("")
         print("After a moment you realize there is no way out of this room.")
     location = new_location
     set_default_complete()
 
+# grab an item - "grab" command assigned
+def grab():
+    # necessary for item name auto-completion
+    global volcab
+    new_volcab = []
+
+    # assign all items in this room to the auto-completion list
+    counter = 0
+    have_taken = False
+    for id in items:
+        if (items[id].location == location and items[id].visited is not True):
+            counter = counter + 1
+            new_volcab.append(items[id].name)
+            print("  Entry: " + items[id].name)
+
+    if (counter > 0):
+        set_custom_complete(new_volcab)
+        print("")
+        grab = input("I want to grab > ")
+        for id in items:
+            if (items[id].location == location):
+                if (items[id].name == grab):
+                    items[id].visited = True
+                    print("")
+                    print("You grab the " + items[id].name + " and put it into your bag.")
+                    have_taken = True
+                    break
+        if (not have_taken):
+            print("")
+            print("You decide you don't want to grab anything right now.")
+    else:
+        print("After a moment you realize no items can be found in this room.")
+    set_default_complete()
+
+# check everything you have encountered - "recap" command assigned
+def recap():
+    counter_r = 0
+    counter_o = 0
+    counter_i = 0
+    for id in rooms:
+        if (rooms[id].visited):
+            counter_r = counter_r + 1
+    for id in objectives:
+        if (objectives[id].visited):
+            counter_o = counter_o + 1
+    for id in items:
+        if (items[id].visited):
+            counter_i = counter_i + 1
+    print("You have visited " + str(counter_r) + " room(s). You feel like there is/are " + str(len(rooms) - counter_r) + " more to discover.")
+    print("You have talked to " + str(counter_o) + " creature(s). You guess there is/are " + str(len(objectives) - counter_o) + " more waiting for contact.")
+    print("You have grabbed " + str(counter_i) + " item(s). Maybe you can put " + str(len(items) - counter_i) + " additional one(s) into your bag.")
+    
 # helper functions, cannot be triggered by the player directly
 # resets the auto-completion to the default actions list
 def set_default_complete():
@@ -272,10 +330,10 @@ def talk_to(name, url):
     print(name + " gives you following quest:")
     display_markdown(name + "_q")
                     
-    print("")
-    print(name + " asks you if you want to open this quest.")
-    if (yesno()):
-        webbrowser.open(url, new=1)
+    #print("")
+    #print(name + " asks you if you want to open this quest.")
+    #if (yesno()):
+    #    webbrowser.open(url, new=1)
 
     print("")
     print("After a short while " + name + " also offers you the solution.")
@@ -316,6 +374,7 @@ def load_data():
     counter_r = 1
     counter_o = 1
     counter_j = 1
+    counter_i = 1
     f = open("data.json")
     data = json.load(f)
     for i in data["rooms"]:
@@ -333,6 +392,7 @@ def load_data():
         objective.difficulty = i["difficulty"]
         objective.url = i["url"]
         objective.supports = i["supports"]
+        objective.requires = i["requires"]
         objectives.update({counter_o: objective})
         counter_o = counter_o + 1
     for i in data["junctions"]:
@@ -342,8 +402,15 @@ def load_data():
         junction.location = i["location"]
         junctions.update({counter_j: junction})
         counter_j = counter_j + 1
+    for i in data["items"]:
+        item = Item()
+        item.name = i["name"]
+        item.description = i["description"]
+        item.location = i["location"]
+        items.update({counter_i: item})
+        counter_i = counter_i + 1
     f.close()
-    return (counter_r - 1 + counter_o - 1 + counter_j -1)
+    return (counter_r - 1 + counter_o - 1 + counter_j - 1 + counter_i - 1)
 
 # queries the user to enter a command and triggers the matching function
 def query_user():
@@ -359,12 +426,16 @@ def query_user():
         beam()
     elif (cmd == "exit"):
         cont = 0
+    elif (cmd == "grab"):
+        grab()
     elif (cmd == "inspect"):
         inspect()
     elif (cmd == "look"):
         look()
     elif (cmd == "meditate"):
         meditate()
+    elif (cmd == "recap"):
+        recap()
     elif (cmd == "scrutinize"):
         scrutinize()
     elif (cmd == "talk"):
@@ -391,6 +462,7 @@ if __name__ == '__main__':
     load_data()
 
     # start the game until the player decides to quit
+    print("")
     arrive()
     print("")
     meditate()
