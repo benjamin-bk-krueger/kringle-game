@@ -12,7 +12,7 @@ from junction import Junction
 from item import Item
 
 cont = 1                # the program will run until this value is set to 0
-location = 1            # the starting room always has ID 1, changes later in the game by walking around
+location = "start"      # the starting room, changes later in the game by walking around
 
 rooms = dict()          # contains all available rooms
 objectives = dict()     # contains all available objectives
@@ -31,7 +31,7 @@ def arrive():
     print("")
     print("You are arriving at a strange and unknown location.")
     print("You are feeling a little dizzy.")
-    rooms.get(location).visited = True
+    rooms[location].visited = True
 
 # get some about information - "scrutinize" command assigned
 def scrutinize():
@@ -56,29 +56,29 @@ def inspect():
     print("You are inspecting the place and looking for further objects you can interact with...")
     print("")
 
-    for id in objectives:
-        if (objectives[id].location == location):
-            print("In this room you can see " + objectives[id].name + ", " + objectives[id].description + ".")
-            if (objectives[id].supports == "main"):
-                print("    " + objectives[id].name + " seems to know something about a main objective.")
+    for name, objective in objectives.items():
+        if (objective.location == location):
+            print("In this room you can see " + name + ", " + objective.description + ".")
+            if (objective.supports == "main"):
+                print("    " + name + " seems to know something about a main objective.")
             else:
-                print("    " + objectives[id].name + " can you give some hints for the quest " + objectives[id].supports + " is offering.")
-            if (objectives[id].visited):
-                print("    " + "You already have talked to " + objectives[id].name + " before.")
+                print("    " + name + " can you give some hints for the quest " + objective.supports + " is offering.")
+            if (objective.visited):
+                print("    " + "You already have talked to " + name + " before.")
             else:
-                print("    " + "You have not talked to " + objectives[id].name + " yet.")
+                print("    " + "You have not talked to " + name + " yet.")
             print("")
 
-    for id in items:
-        if (items[id].location == location):
-            if (not items[id].visited):
-                print("In a corner you can see a " + items[id].name + " lying around. You guess it's a " + items[id].description + ".")
+    for name, item in items.items():
+        if (item.location == location):
+            if (not item.visited):
+                print("In a corner you can see a " + name + " lying around. You guess it's a " + item.description + ".")
                 print("")
 
-    for id in junctions:
-        if (junctions[id].location == location):
-            print(junctions[id].description + " you can see a junction to " + rooms.get(junctions[id].destination).name)
-            if (rooms.get(junctions[id].destination).visited):
+    for name, junction in junctions.items():
+        if (junction.location == location):
+            print(junction.description + " you can see a junction to " + junction.destination)
+            if (rooms[junction.destination].visited):
                 print ("    " + "You have visited that location already.")
             else:
                 print ("    " + "You have not seen that location yet.")
@@ -91,11 +91,11 @@ def meditate():
 
 # have a quick look at this place - "look" command assigned
 def look():
-    print("You are currently at " + rooms.get(location).name + " and admiring what your eyes can see...")
+    print("You are currently at " + location + " and admiring what your eyes can see...")
     print("")
-    display_image(rooms.get(location).name)
+    display_image(location)
     print("")
-    print(rooms.get(location).description)
+    print(rooms[location].description)
 
 # phone other creatures you already have discovered - "phone" command assigned
 def phone():
@@ -110,25 +110,20 @@ def phone():
 
     # assign all visited creatures to the auto-completion list
     counter = 0
-    have_talked = False
-    for id in objectives:
-        if (objectives[id].visited):
+    for name, objective in objectives.items():
+        if (objective.visited):
             counter = counter + 1
-            new_volcab.append(objectives[id].name)
-            print("  Entry: " + objectives[id].name)
+            new_volcab.append(name)
+            print("  Entry: " + name)
 
     if (counter > 0):
         set_custom_complete(new_volcab)
         print("")
-        talk = input("I want to talk to > ")
-        for id in objectives:
-            if (objectives[id].visited):
-                if (objectives[id].name == talk):
-                    objectives[id].visited = True
-                    talk_to(objectives[id].name, objectives[id].url)
-                    have_talked = True
-                    break
-        if (not have_talked):
+        name = input("I want to talk to > ")
+        if (name in objectives):
+            objectives[name].visited = True
+            talk_to(name, objectives[name].url)
+        else:
             print("")
             print("You decide you don't want to talk right now.")
     else:
@@ -143,25 +138,20 @@ def talk():
 
     # assign all creatures in this room to the auto-completion list
     counter = 0
-    have_talked = False
-    for id in objectives:
-        if (objectives[id].location == location):
+    for name, objective in objectives.items():
+        if (objective.location == location):
             counter = counter + 1
-            new_volcab.append(objectives[id].name)
-            print("  Entry: " + objectives[id].name)
+            new_volcab.append(name)
+            print("  Entry: " + name)
 
     if (counter > 0):
         set_custom_complete(new_volcab)
         print("")
-        talk = input("I want to talk to > ")
-        for id in objectives:
-            if (objectives[id].location == location):
-                if (objectives[id].name == talk):
-                    objectives[id].visited = True
-                    talk_to(objectives[id].name, objectives[id].url)
-                    have_talked = True
-                    break
-        if (not have_talked):
+        name = input("I want to talk to > ")
+        if (name in objectives):
+            objectives[name].visited = True
+            talk_to(name, objectives[name].url)
+        else:
             print("")
             print("You decide you don't want to talk right now.")
     else:
@@ -182,33 +172,25 @@ def beam():
 
     # assign all visited rooms to the auto-completion list
     counter = 0
-    new_location = 1
-    for id in rooms:
-        if (rooms[id].visited):
+    for name, room in rooms.items():
+        if (room.visited):
             counter = counter + 1
-            new_volcab.append(rooms[id].name)
-            print("  Entry: " + rooms[id].name)
+            new_volcab.append(name)
+            print("  Entry: " + name)
 
     if (counter > 0):
         set_custom_complete(new_volcab)
         print("")
-        walk = input("I want to go to > ")
-        for id in rooms:
-            if (rooms[id].visited):
-                if (rooms[id].name == walk):
-                    print("")
-                    print("You are going to " + rooms[id].name)
-                    new_location = id
-                    break
-                else:
-                    new_location = location
-                    print("")
-                    print("You decide to stay where you currently are.")
-                    break
+        destination = input("I want to go to > ")
+        if (location != destination and destination in rooms):
+            print("")
+            print("You are going to " + destination)
+            location = destination
+        else:
+            print("")
+            print("You decide to stay where you currently are.")
     else:
-        new_location = location
         print("After a moment you realize you have not been anywhere yet.")
-    location = new_location
     set_default_complete()
 
 # walk to other places - "walk" command assigned
@@ -220,34 +202,26 @@ def walk():
 
     # assign all connected rooms to the auto-completion list
     counter = 0
-    new_location = 1
-    for id in junctions:
-        if (junctions[id].location == location):
+    for id, junction in junctions.items():
+        if (junction.location == location):
             counter = counter + 1
-            new_volcab.append(rooms.get(junctions[id].destination).name)
-            print("  Entry: " + rooms.get(junctions[id].destination).name)
+            new_volcab.append(junction.destination)
+            print("  Entry: " + junction.destination)
 
     if (counter > 0):
         set_custom_complete(new_volcab)
         print ("")
-        walk = input("I want to go to > ")
-        for id in junctions:
-            if (junctions[id].location == location):
-                if (rooms.get(junctions[id].destination).name == walk):
-                    print("")
-                    print("You are going to " + rooms.get(junctions[id].destination).name)
-                    new_location = junctions[id].destination
-                    rooms.get(junctions[id].destination).visited = True
-                    break
-                else:
-                    new_location = location
-                    print("")
-                    print("You decide to stay where you currently are.")
-                    break
+        destination = input("I want to go to > ")
+        if (location != destination and destination in rooms):
+            print("")
+            print("You are going to " + destination)
+            location = destination
+            rooms[destination].visited = True
+        else:
+            print("")
+            print("You decide to stay where you currently are.")
     else:
-        new_location = location
         print("After a moment you realize there is no way out of this room.")
-    location = new_location
     set_default_complete()
 
 # grab an item - "grab" command assigned
@@ -258,26 +232,21 @@ def grab():
 
     # assign all items in this room to the auto-completion list
     counter = 0
-    have_taken = False
-    for id in items:
-        if (items[id].location == location and items[id].visited is not True):
+    for name, item in items.items():
+        if (item.location == location and item.visited is not True):
             counter = counter + 1
-            new_volcab.append(items[id].name)
-            print("  Entry: " + items[id].name)
+            new_volcab.append(name)
+            print("  Entry: " + name)
 
     if (counter > 0):
         set_custom_complete(new_volcab)
         print("")
-        grab = input("I want to grab > ")
-        for id in items:
-            if (items[id].location == location):
-                if (items[id].name == grab):
-                    items[id].visited = True
-                    print("")
-                    print("You grab the " + items[id].name + " and put it into your bag.")
-                    have_taken = True
-                    break
-        if (not have_taken):
+        name = input("I want to grab > ")
+        if (name in items):
+            items[name].visited = True
+            print("")
+            print("You grab the " + name + " and put it into your bag.")
+        else:
             print("")
             print("You decide you don't want to grab anything right now.")
     else:
@@ -289,14 +258,14 @@ def recap():
     counter_r = 0
     counter_o = 0
     counter_i = 0
-    for id in rooms:
-        if (rooms[id].visited):
+    for name, room in rooms.items():
+        if (room.visited):
             counter_r = counter_r + 1
-    for id in objectives:
-        if (objectives[id].visited):
+    for name, objective in objectives.items():
+        if (objective.visited):
             counter_o = counter_o + 1
-    for id in items:
-        if (items[id].visited):
+    for name, item in items.items():
+        if (item.visited):
             counter_i = counter_i + 1
     print("You have visited " + str(counter_r) + " room(s). You feel like there is/are " + str(len(rooms) - counter_r) + " more to discover.")
     print("You have talked to " + str(counter_o) + " creature(s). You guess there is/are " + str(len(objectives) - counter_o) + " more waiting for contact.")
@@ -326,20 +295,24 @@ def talk_to(name, url):
     print("You are talking to " + name)
     display_image(name)
 
-    print("")
-    print(name + " gives you following quest:")
-    display_markdown(name + "_q")
-                    
-    #print("")
-    #print(name + " asks you if you want to open this quest.")
-    #if (yesno()):
-    #    webbrowser.open(url, new=1)
+    if (objectives[name].requires != "none" and not items[objectives[name].requires].visited):
+        print("")
+        print(name + " asks for a " + objectives[name].requires + ". Sadly you can't find it in your bag.")
+    else:
+        print("")
+        print(name + " gives you following quest:")
+        display_markdown(name + "_q")
+                        
+        #print("")
+        #print(name + " asks you if you want to open this quest.")
+        #if (yesno()):
+        #    webbrowser.open(url, new=1)
 
-    print("")
-    print("After a short while " + name + " also offers you the solution.")
-    print("Do you want to hear it?")
-    if (yesno()):
-        display_markdown(name + "_a")
+        print("")
+        print("After a short while " + name + " also offers you the solution.")
+        print("Do you want to hear it?")
+        if (yesno()):
+            display_markdown(name + "_a")
 
 # auto-completion with Python readline, requires readline
 def complete(text,state):
@@ -371,46 +344,40 @@ def display_markdown(md_name):
 
 # parses the JSON based configuration file and creature objects from that configuration, requires json
 def load_data():
-    counter_r = 1
-    counter_o = 1
-    counter_j = 1
-    counter_i = 1
+    global location
+    counter = 1
     f = open("data.json")
     data = json.load(f)
     for i in data["rooms"]:
         room = Room()
-        room.name = i["name"]
         room.description = i["description"]
-        room.location = i["location"]
-        rooms.update({counter_r: room})
-        counter_r = counter_r + 1
+        rooms.update({i["name"]: room})
+
+        # the first room is the starting location
+        if (location == "start"):
+            location = i["name"]
     for i in data["objectives"]:
         objective = Objective()
-        objective.name = i["name"]
         objective.description = i["description"]
         objective.location = i["location"]
         objective.difficulty = i["difficulty"]
         objective.url = i["url"]
         objective.supports = i["supports"]
         objective.requires = i["requires"]
-        objectives.update({counter_o: objective})
-        counter_o = counter_o + 1
+        objectives.update({i["name"]: objective})
     for i in data["junctions"]:
         junction = Junction()
         junction.destination = i["destination"]
         junction.description = i["description"]
         junction.location = i["location"]
-        junctions.update({counter_j: junction})
-        counter_j = counter_j + 1
+        junctions.update({counter: junction})
+        counter = counter + 1
     for i in data["items"]:
         item = Item()
-        item.name = i["name"]
         item.description = i["description"]
         item.location = i["location"]
-        items.update({counter_i: item})
-        counter_i = counter_i + 1
+        items.update({i["name"]: item})
     f.close()
-    return (counter_r - 1 + counter_o - 1 + counter_j - 1 + counter_i - 1)
 
 # queries the user to enter a command and triggers the matching function
 def query_user():

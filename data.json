@@ -1,39 +1,37 @@
 {
     "rooms": [
         {
-            "location": 1,
             "name": "TheNorthPole_Orientation",
             "description": "This is the entry point to this years KringleCon. In front of you you can see a green fence."
         },
         {
-            "location": 2,
             "name": "TheNorthPole_TheNorthPole",
             "description": "The main location of this years KringleCon and FrostFest. At the left side you can see the KringleCon building, at the right side there is the Frostfest tower."
         }
     ],
     "objectives": [
         {
-            "location": 1,
             "name": "JingleRingford",
             "description": "an Elf standing next to a Terminal for \"Objective 1 - KringleCon Orientation\"",
+            "location": "TheNorthPole_Orientation",
             "difficulty": 1,
             "url": "https://docker2021.kringlecon.com/?challenge=opengate&id=898f4faf-fa0f-4494-9875-32e39cd5c371&username=Test&area=staging&location=6,4",
             "supports": "main",
             "requires": "WiFiDongle"
         },
         {
-            "location": 2,
             "name": "GreasyGopherGuts",
             "description": "a Troll standing next to a Terminal called \"Greping for Gold\"",
+            "location": "TheNorthPole_TheNorthPole",
             "difficulty": 1,
             "url": "tbd",
             "supports": "JingleRingford",
             "requires": "none"
         },
         {
-            "location": 2,
             "name": "NoelBoetie",
             "description": "an Elf standing next to a Terminal called \"Logic Munchers\"",
+            "location": "TheNorthPole_TheNorthPole",
             "difficulty": 1,
             "url": "tbd",
             "supports": "JingleRingford",
@@ -42,21 +40,21 @@
     ],
     "junctions": [
         {
-            "location": 1,
-            "destination": 2,
+            "destination": "TheNorthPole_TheNorthPole",
+            "location": "TheNorthPole_Orientation",
             "description": "In front of you"
         },
         {
-            "location": 2,
-            "destination": 1,
+            "destination": "TheNorthPole_Orientation",
+            "location": "TheNorthPole_TheNorthPole",
             "description": "Behind of you"
         }
     ],
     "items": [
         {
-            "location": 1,
             "name": "WiFiDongle",
-            "description": "A USB WiFi dongle"
+            "description": "A USB WiFi dongle",
+            "location": "TheNorthPole_Orientation"
         }
     ]
 }

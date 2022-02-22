@@ -10,11 +10,6 @@ class Object:
     def get_visited(self):
         return self.__visited
 
-    def set_name(self, name):
-        self.__name = name
-    def get_name(self):
-        return self.__name
-
     def set_description(self, description):
         self.__description = description
     def get_description(self):
@@ -26,6 +21,5 @@ class Object:
         return self.__location
     
     visited = property(get_visited, set_visited)
-    name = property(get_name, set_name)
     description = property(get_description, set_description)
     location = property(get_location, set_location)

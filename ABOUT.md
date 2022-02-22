@@ -82,3 +82,9 @@ Quickly ran the Docker container on a small AWS EC2 instance. Proof of Concept: 
 Bought a book covering Python...
 Next week I'll join a bootcamp "GitHub for Everyone" hosted by INE. I'm sure I'll learn a lot of things. 
 Guess setting up something like Kubernetes won't be so easy ... INE also has a lot of courses covering that 
+
+***2022-02-22***
+
+Added items as new object and feature to the game.
+Did a lot of rework to make the code much more readable and beautiful.
+Maybe I should read my Pyhon book before writing too much code ... the more code there is the more rework there may be ...
