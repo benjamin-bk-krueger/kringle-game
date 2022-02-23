@@ -17,6 +17,9 @@ class TestGame(unittest.TestCase):
     
     def test_loaded_items(self):
         self.assertGreater(len(game.items), 0, "Loaded items should be greater than 0")
+
+    def test_loaded_characters(self):
+        self.assertGreater(len(game.characters), 0, "Loaded characters should be greater than 0")
     
     def test_display_image(self):
         self.assertTrue(game.display_image("logo"), "Display image logo is not successful")

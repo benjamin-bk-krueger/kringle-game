@@ -10,6 +10,7 @@ from room import Room
 from objective import Objective
 from junction import Junction
 from item import Item
+from character import Character
 
 cont = 1                # the program will run until this value is set to 0
 location = "start"      # the starting room, changes later in the game by walking around
@@ -18,6 +19,7 @@ rooms = dict()          # contains all available rooms
 objectives = dict()     # contains all available objectives
 junctions = dict()      # contains all junctions between the rooms
 items = dict()          # contains all available items
+characters = dict()     # contains all available side characters
 
 volcab = []             # contains autocomplete values
 default_actions = ['beam','cry','exit','grab','help','inspect','look','meditate','phone','quit','recap','scrutinize','talk','walk'] # default actions
@@ -51,6 +53,17 @@ def help():
     print("Then it whispers: \"TAB is your friend\"")
     print("You wonder what this TAB may be? A creature? A scroll?")
 
+# set all rooms, objectives, items, etc. to status visited/taken - HIDDEN "cheat" command assigned
+def cheat():
+    print("Suddenly you hear a rolling thunder all around you. You quickly close your eyes and open them again after a few seconds.")
+    print("Has anything happened? No? How strange you think and decide to carry on.")
+    for name, room in rooms.items():
+        room.visited = True
+    for name, objective in objectives.items():
+        objective.visited = True
+    for name, item in items.items():
+        item.visited = True
+
 # have a detailed look what kind of objects a room contains - "inspect" command assigned
 def inspect():
     print("You are inspecting the place and looking for further objects you can interact with...")
@@ -74,6 +87,11 @@ def inspect():
             if (not item.visited):
                 print("In a corner you can see a " + name + " lying around. You guess it's a " + item.description + ".")
                 print("")
+
+    for name, character in characters.items():
+        if (character.location == location):
+            print("Furthermore you can see " + name + ", " + character.description)
+            print("")
 
     for name, junction in junctions.items():
         if (junction.location == location):
@@ -346,12 +364,14 @@ def display_markdown(md_name):
 def load_data():
     global location
     counter = 1
+    counter_loaded = 0
     f = open("data.json")
     data = json.load(f)
     for i in data["rooms"]:
         room = Room()
         room.description = i["description"]
         rooms.update({i["name"]: room})
+        counter_loaded = counter_loaded + 1
 
         # the first room is the starting location
         if (location == "start"):
@@ -365,6 +385,7 @@ def load_data():
         objective.supports = i["supports"]
         objective.requires = i["requires"]
         objectives.update({i["name"]: objective})
+        counter_loaded = counter_loaded + 1
     for i in data["junctions"]:
         junction = Junction()
         junction.destination = i["destination"]
@@ -372,12 +393,21 @@ def load_data():
         junction.location = i["location"]
         junctions.update({counter: junction})
         counter = counter + 1
+        counter_loaded = counter_loaded + 1
     for i in data["items"]:
         item = Item()
         item.description = i["description"]
         item.location = i["location"]
         items.update({i["name"]: item})
+        counter_loaded = counter_loaded + 1
+    for i in data["characters"]:
+        character = Character()
+        character.description = i["description"]
+        character.location = i["location"]
+        characters.update({i["name"]: character})
+        counter_loaded = counter_loaded + 1
     f.close()
+    return(counter_loaded)
 
 # queries the user to enter a command and triggers the matching function
 def query_user():
@@ -387,6 +417,8 @@ def query_user():
     print("")
     if (cmd == "help"):
         help()
+    if (cmd == "cheat"):
+        cheat()
     elif (cmd == "cry"):
         help()
     elif (cmd == "beam"):

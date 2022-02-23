@@ -56,5 +56,12 @@
             "description": "A USB WiFi dongle",
             "location": "TheNorthPole_Orientation"
         }
+    ],
+    "characters": [
+        {
+            "name": "Santa",
+            "description": "standing in the middle of the room surrounded by the pigeons",
+            "location": "TheNorthPole_TheNorthPole"
+        }
     ]
 }

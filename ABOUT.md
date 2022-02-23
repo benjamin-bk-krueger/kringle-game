@@ -88,3 +88,8 @@ Guess setting up something like Kubernetes won't be so easy ... INE also has a l
 Added items as new object and feature to the game.
 Did a lot of rework to make the code much more readable and beautiful.
 Maybe I should read my Pyhon book before writing too much code ... the more code there is the more rework there may be ...
+
+***2022-02-23***
+
+Quickly implemented non-interactive side characters/objects and a cheat function.
+Yeah, cheating, cheating :)
