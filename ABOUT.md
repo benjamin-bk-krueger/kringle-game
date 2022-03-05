@@ -1,6 +1,6 @@
 ***2022-02-14***
 
-Today I took the decision I want to (re-)gain developer's skills (sadly my job is rather "managerial"). There are so many interesting technologies and tools out there you should know more about. So my plan is to build a project using all those technologies and tools and to learn at the same time. I don't know how much time I can invest here but to see my own progress I'm writing these notes at the same time.
+Today I took the decision I want to (re-)gain developer's skills (sadly my job is rather "managerial"). There are so many interesting technologies and tools out there you should know more about. So my plan is to build a project using all those technologies and tools and to learn at the same time. I don't know how much time I can invest here but to see my own progress I'm writing these notes at the same time.  
 My theme will be the SANS Holiday Hack Challenge (https://www.sans.org/mlp/holiday-hack-challenge/). My goal is to create some console-based adventure game like the gold old LucasArts games in the 90s. It should mimic the original game and offer a walkthrough for the original game's quests at the same time. 
 
 I have set up a GitHub Repository to hold all my project files. I have cloned that repository both on my MacBook as well as on my Mac Mini. Currently it's just a way to keep these directories in sync but I guess I'll get in touch with more advanced features in the future.
@@ -13,7 +13,7 @@ Btw. I'm writing this log in markdown, so I'm starting with three technologies o
 
 ***2022-02-14 (late evening)***
 
-Wow, that's fun. I'm feeling like "I can't stop, just another feature to be implemented". Rooms do have attributes (ID, name, description). Guess it's a good thing to keep that separate. Maybe the program will support completely different scenarios/worlds just be providing other game data. 
+Wow, that's fun. I'm feeling like "I can't stop, just another feature to be implemented". Rooms do have attributes (ID, name, description). Guess it's a good thing to keep that separate.   Maybe the program will support completely different scenarios/worlds just be providing other game data. 
 
 JSON seems to be a good format to provide this kind of game data. Python allows me to load data from a JSON file using just 2 or 3 lines of code.
 
@@ -47,17 +47,17 @@ In the original game each objective has a challenge the player needs to solve. M
 
 ***2022-02-18***
 
-Added the fourth technology to my I-want-to-learn-tech-stack: Docker!
-I have created a very simple Dockerfile taking an Ubuntu image, adding Python and the modules as well as my program files to it.
+Added the fourth technology to my I-want-to-learn-tech-stack: Docker!  
+I have created a very simple Dockerfile taking an Ubuntu image, adding Python and the modules as well as my program files to it.  
 Created some bash scripts to automate things: building a Docker container, running it, ...
 Tested my shiny Docker container both on MacOS and Linux
 
 ***2022-02-19***
 
-I don't feel confident creating all the ASCII images using a web tool anymore. Seems to be a lot of work and includes a lot of manual steps. There is a tool called JP2A which is able to read JPEG files and render ASCII art. There is no real Python implementation but I guess it's okay to rely on that external tool. Adding it to the Docker container is very simple. This way it doesn't matter if the user has the tool installed or not.
+I don't feel confident creating all the ASCII images using a web tool anymore. Seems to be a lot of work and includes a lot of manual steps. There is a tool called JP2A which is able to read JPEG files and render ASCII art. There is no real Python implementation but I guess it's okay to rely on that external tool. Adding it to the Docker container is very simple. This way it doesn't matter if the user has the tool installed or not.  
 Python is powerful, Docker is powerful, I'm feeling powerful!
 
-I have a lot of ideas: multi lingual support, cloud (kubernetes?), better integration to the original game's challenges, error handling, ...
+I have a lot of ideas: multi lingual support, cloud (kubernetes?), better integration to the original game's challenges, error handling, ...  
 Just set up a GitHub projects site to keep track of my tasks and ideas
 
 A week is over and I feel like I really have achieved something. I have a small basic interactive game which supports configurable game data and can be launched anywhere using containerization. 
@@ -79,17 +79,24 @@ WEEKEND TIME!!!
 ***2022-02-20***
 
 Quickly ran the Docker container on a small AWS EC2 instance. Proof of Concept: Successful!!
-Bought a book covering Python...
-Next week I'll join a bootcamp "GitHub for Everyone" hosted by INE. I'm sure I'll learn a lot of things. 
+Bought a book covering Python...  
+Next week I'll join a bootcamp "GitHub for Everyone" hosted by INE. I'm sure I'll learn a lot of things.  
 Guess setting up something like Kubernetes won't be so easy ... INE also has a lot of courses covering that 
 
 ***2022-02-22***
 
-Added items as new object and feature to the game.
-Did a lot of rework to make the code much more readable and beautiful.
+Added items as new object and feature to the game.  
+Did a lot of rework to make the code much more readable and beautiful.  
 Maybe I should read my Pyhon book before writing too much code ... the more code there is the more rework there may be ...
 
 ***2022-02-23***
 
 Quickly implemented non-interactive side characters/objects and a cheat function.
 Yeah, cheating, cheating :)
+
+***2022-03-02***
+
+I have attended a three days bootcamp hosted by INE: "GitHub for Everyone".  
+Now I do know a lot more about issues, branches, pull request and actions.  
+Always remember: Never ever commit to main!! ;-) 
+
