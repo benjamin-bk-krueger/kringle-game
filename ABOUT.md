@@ -100,3 +100,11 @@ I have attended a three days bootcamp hosted by INE: "GitHub for Everyone".
 Now I do know a lot more about issues, branches, pull request and actions.  
 Always remember: Never ever commit to main!! ;-) 
 
+***2022-03-12***
+
+What a busy week...  
+I realize having both WeTTY as well as the game in one repository and one Dockerfile is not a good idea. Even a small change in some Python file will trigger everything to be rebuilt.  
+I have created a separate repository just for WeTTY.  Now I do have a WeTTY container and a game container. How can I connect those???
+Searching the internet I have found docker-compose might be the solution.  
+I have created a container stack using a docker-compose.yml file. It will start one container for WeTTY and one for the game which can be accessed by WeTTY via SSH. Really cool. This might be helpful later when I have the time to "learn" Kubernetes.
+

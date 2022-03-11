@@ -2,11 +2,12 @@ version: "3.7"
 
 services:
   game:
-    build: .
+    # build: .
+    image: benjaminkrueger/2022-kringlecon
     command: /usr/sbin/sshd -D
     container_name: kringle_game
   webssh:
-    build: ./wetty/
+    image : benjaminkrueger/wetty
     command: wetty -p 3000 --ssh-host game
     ports:
       - 3000:3000
