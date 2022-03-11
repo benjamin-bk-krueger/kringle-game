@@ -1,0 +1,13 @@
+version: "3.7"
+
+services:
+  game:
+    build: .
+    command: /usr/sbin/sshd -D
+    container_name: kringle_game
+  webssh:
+    build: ./wetty/
+    command: wetty -p 3000 --ssh-host game
+    ports:
+      - 3000:3000
+    container_name: kringle_webssh
