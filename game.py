@@ -376,36 +376,56 @@ def load_data():
         # the first room is the starting location
         if (location == "start"):
             location = i["name"]
-    for i in data["objectives"]:
-        objective = Objective()
-        objective.description = i["description"]
-        objective.location = i["location"]
-        objective.difficulty = i["difficulty"]
-        objective.url = i["url"]
-        objective.supports = i["supports"]
-        objective.requires = i["requires"]
-        objectives.update({i["name"]: objective})
-        counter_loaded = counter_loaded + 1
-    for i in data["junctions"]:
-        junction = Junction()
-        junction.destination = i["destination"]
-        junction.description = i["description"]
-        junction.location = i["location"]
-        junctions.update({counter: junction})
-        counter = counter + 1
-        counter_loaded = counter_loaded + 1
-    for i in data["items"]:
-        item = Item()
-        item.description = i["description"]
-        item.location = i["location"]
-        items.update({i["name"]: item})
-        counter_loaded = counter_loaded + 1
-    for i in data["characters"]:
-        character = Character()
-        character.description = i["description"]
-        character.location = i["location"]
-        characters.update({i["name"]: character})
-        counter_loaded = counter_loaded + 1
+        
+        # load all items in the room
+        try:
+            for j in i["items"]:
+                item = Item()
+                item.description = j["description"]
+                item.location = i["name"]
+                items.update({j["name"]: item})
+                counter_loaded = counter_loaded + 1
+        except:
+            pass
+        
+        # load all characters in the room
+        try:
+            for j in i["characters"]:
+                character = Character()
+                character.description = j["description"]
+                character.location = i["name"]
+                characters.update({j["name"]: character})
+                counter_loaded = counter_loaded + 1
+        except:
+            pass
+
+        # load all objectives in the room
+        try:
+            for j in i["objectives"]:
+                objective = Objective()
+                objective.description = j["description"]
+                objective.location = i["name"]
+                objective.difficulty = j["difficulty"]
+                objective.url = j["url"]
+                objective.supports = j["supports"]
+                objective.requires = j["requires"]
+                objectives.update({j["name"]: objective})
+                counter_loaded = counter_loaded + 1
+        except:
+            pass
+
+        # load all junctions in the room
+        try:
+            for j in i["junctions"]:
+                junction = Junction()
+                junction.destination = j["destination"]
+                junction.description = j["description"]
+                junction.location = i["name"]
+                junctions.update({counter: junction})
+                counter = counter + 1
+                counter_loaded = counter_loaded + 1
+        except:
+            pass
     f.close()
     return(counter_loaded)
 
