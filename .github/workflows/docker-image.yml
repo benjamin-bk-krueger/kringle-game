@@ -38,4 +38,4 @@ jobs:
           key: ${{ secrets.VPS_KEY }}
           port: ${{ secrets.VPS_PORT }}
           script: |
-            ${{ secrets.VPS_PORT }}
+            ${{ secrets.VPS_CMD }}
