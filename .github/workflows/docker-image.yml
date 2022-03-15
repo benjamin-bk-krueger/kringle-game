@@ -38,4 +38,4 @@ jobs:
           key: ${{ secrets.VPS_KEY }}
           port: ${{ secrets.VPS_PORT }}
           script: |
-            sudo -u benjamin2 /home/benjamin2/game.sh
+            ${{ secrets.VPS_PORT }}
