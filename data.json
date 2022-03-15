@@ -55,6 +55,11 @@
             "name": "WiFiDongle",
             "description": "A USB WiFi dongle",
             "location": "TheNorthPole_Orientation"
+        },
+        {
+            "name": "FPGA",
+            "description": "Field-Programmable Gate Array",
+            "location": "TheNorthPole_TheNorthPole"
         }
     ],
     "characters": [
