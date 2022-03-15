@@ -111,3 +111,7 @@ I have created a container stack using a docker-compose.yml file. It will start 
 ***2022-03-15***
 
 Didn't manage to get minikube running on a VPS. Instead I have set up a VPS running an Apache web server. This one acts as a proxy and sends the requests to the WeTTY container.
+
+***2022-03-15 (evening)***
+
+Modified the Github Action so it will deploy the images to the VPS and run the docker containers automatically.
