@@ -1,4 +1,4 @@
-FROM ubuntu
+FROM ubuntu:20.04
 
 LABEL version="0.1"
 LABEL maintaner="Ben Krueger <sayhello@blk.pm>"
