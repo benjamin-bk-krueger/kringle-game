@@ -321,10 +321,12 @@ def talk_to(name, url):
         print(name + " gives you following quest:")
         display_markdown(name + "_q")
                         
-        #print("")
-        #print(name + " asks you if you want to open this quest.")
-        #if (yesno()):
-        #    webbrowser.open(url, new=1)
+        print("")
+        print(name + " asks you if you want to open this quest.")
+        if (yesno()):
+            # webbrowser.open(url, new=1)
+            print("")
+            print(url)
 
         print("")
         print("After a short while " + name + " also offers you the solution.")
