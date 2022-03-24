@@ -1,10 +1,12 @@
-import os           # necessary to access terminal size
-import json         # necessary to read json-based data file
-import readline     # necessary to be able to auto-complete user
-import webbrowser   # necessary to display web pages
+import os               # necessary to access terminal size and file operations
+import json             # necessary to read json-based data file
+import readline         # necessary to be able to auto-complete user
+# import webbrowser     # necessary to display web pages
+import urllib.request   # necessary to download game data
 
 from rich.console import Console    # necessary for markdown display
 from rich.markdown import Markdown  # necessary for markdown display
+from zipfile import ZipFile         # necessary for ZIP handling
 
 from room import Room
 from objective import Objective
@@ -364,6 +366,11 @@ def display_markdown(md_name):
 
 # parses the JSON based configuration file and creature objects from that configuration, requires json
 def load_data():
+    url = 'https://github.com/benjamin-bk-krueger/2021-kringlecon/raw/main/2021-kringlecon.zip'
+    urllib.request.urlretrieve(url, r'./gamedata.zip')
+    with ZipFile('./gamedata.zip', 'r') as zip:
+        zip.extractall()
+
     global location
     counter = 1
     counter_loaded = 0
