@@ -1,7 +1,7 @@
 FROM ubuntu:20.04
 
 LABEL version="0.1"
-LABEL maintaner="Ben Krueger <sayhello@blk.pm>"
+LABEL maintaner="Ben Krueger <sayhello@blk8.de>"
 #LABEL release-date="2020-04-05"
 #LABEL promoted="true"
 
@@ -14,7 +14,8 @@ RUN pip3 install rich
 RUN apt-get clean
 RUN rm -rf /var/lib/apt/lists/*
 
-RUN mkdir /home/game /home/game/images /home/game/quests
+RUN mkdir /home/game
+# RUN mkdir /home/game/images /home/game/quests
 
 COPY *.sh *.py /home/game/
 # COPY *.json /home/game/
