@@ -30,7 +30,7 @@ default_actions = ['beam','cry','exit','grab','help','inspect','look','meditate'
 console = Console()     # markdown output to console
 
 gamedata = os.environ['HOME'] + "/.kringlecon"  # directory for game data
-gameurl = 'https://github.com/benjamin-bk-krueger/2021-kringlecon/raw/main/2021-kringlecon.zip' # url for game data
+gameurl = 'https://white.blk8.de/kringle_gamedata/2021-kringlecon.zip' # url for game data
 
 
 # all the actions the player can perform
