@@ -40,13 +40,14 @@ def arrive():
     print("")
     print("You are arriving at a strange and unknown location.")
     print("You are feeling a little dizzy.")
+    print("What should be your next steps? You are pausing for a moment.")
     rooms[location].visited = True
 
 # get some about information - "scrutinize" command assigned
 def scrutinize():
     print("A magical voice whispers into your ear:")
     print("\"This game has been created by Ben Krueger\"")
-    print("You wonder what this may mean? You are in a game? Strange thought indeed!")
+    print("You wonder what this may mean? You are inside a game? Strange thought indeed!")
 
 # triggered automatically when the player enters a wrong command - no command assigned
 def lost():
@@ -54,7 +55,7 @@ def lost():
 
 # shows all available commands - "help" command assigned
 def help():
-    print("A magical voice whispers into your ear: \"Following commands are available\"")
+    print("A magical voice whispers into your ear: \"Following commands are available:\"")
     print(default_actions)
     print("")
     print("Then it whispers: \"TAB is your friend\"")
@@ -73,6 +74,7 @@ def cheat():
 
 # fetch the configuration again from the default URL - HIDDEN "urlrefresh" command assigned
 def refresh_data():
+    print("")
     shutil.rmtree(gamedata)
     os.mkdir(gamedata) 
     urllib.request.urlretrieve(gameurl, gamedata + "/gamedata.zip")
