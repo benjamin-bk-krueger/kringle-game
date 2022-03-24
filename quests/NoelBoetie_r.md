@@ -1,1 +1,0 @@
-* Boolean logic: https://eng.libretexts.org/Bookshelves/Computer_Science/Programming_Languages/Introduction_To_MIPS_Assembly_Language_Programming_(Kann)/01%3A_Introduction/1.07%3A_Boolean_Logical_and_Bitwise_Operators
