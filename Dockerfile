@@ -16,9 +16,10 @@ RUN rm -rf /var/lib/apt/lists/*
 
 RUN mkdir /home/game /home/game/images /home/game/quests
 
-COPY *.sh *.py *.json /home/game/
-COPY images/* /home/game/images/
-COPY quests/* /home/game/quests/
+COPY *.sh *.py /home/game/
+# COPY *.json /home/game/
+# COPY images/* /home/game/images/
+# COPY quests/* /home/game/quests/
 
 RUN mkdir /run/sshd
 RUN useradd -s /home/game/game.sh -p $(mkpasswd --hash=SHA-512 game) game
