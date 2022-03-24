@@ -14,7 +14,7 @@ RUN pip3 install rich
 RUN apt-get clean
 RUN rm -rf /var/lib/apt/lists/*
 
-RUN mkdir /home/game
+RUN useradd -m -s /home/game/game.sh -p $(mkpasswd --hash=SHA-512 game) game
 # RUN mkdir /home/game/images /home/game/quests
 
 COPY *.sh *.py /home/game/
@@ -23,6 +23,5 @@ COPY *.sh *.py /home/game/
 # COPY quests/* /home/game/quests/
 
 RUN mkdir /run/sshd
-RUN useradd -s /home/game/game.sh -p $(mkpasswd --hash=SHA-512 game) game
 
 CMD ["/usr/sbin/sshd","-D"]

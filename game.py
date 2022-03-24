@@ -3,6 +3,7 @@ import json             # necessary to read json-based data file
 import readline         # necessary to be able to auto-complete user
 # import webbrowser     # necessary to display web pages
 import urllib.request   # necessary to download game data
+import shutil           # necessary to recursively delete files
 
 from rich.console import Console    # necessary for markdown display
 from rich.markdown import Markdown  # necessary for markdown display
@@ -27,6 +28,10 @@ volcab = []             # contains autocomplete values
 default_actions = ['beam','cry','exit','grab','help','inspect','look','meditate','phone','quit','recap','scrutinize','talk','walk'] # default actions
 
 console = Console()     # markdown output to console
+
+gamedata = os.environ['HOME'] + "/.kringlecon"  # directory for game data
+gameurl = 'https://github.com/benjamin-bk-krueger/2021-kringlecon/raw/main/2021-kringlecon.zip' # url for game data
+
 
 # all the actions the player can perform
 # only triggered once automatically when the player arrives (starts the program) - no command assigned
@@ -65,6 +70,14 @@ def cheat():
         objective.visited = True
     for name, item in items.items():
         item.visited = True
+
+# fetch the configuration again from the default URL - HIDDEN "urlrefresh" command assigned
+def refresh_data():
+    shutil.rmtree(gamedata)
+    os.mkdir(gamedata) 
+    urllib.request.urlretrieve(gameurl, gamedata + "/gamedata.zip")
+    with ZipFile(gamedata + "/gamedata.zip", 'r') as zip:
+        zip.extractall(gamedata)
 
 # have a detailed look what kind of objects a room contains - "inspect" command assigned
 def inspect():
@@ -344,8 +357,8 @@ def complete(text,state):
 # displays a colored ANSII image, depending on the terminal size, requires external program
 def display_image(image_name):
     try:
-        f = open("images/" + image_name + ".jpg","r")
-        os.system("/bin/jp2a " + "images/" + image_name + ".jpg --colors --fill --color-depth=8")
+        f = open(gamedata + "/images/" + image_name + ".jpg","r")
+        os.system("/bin/jp2a " + gamedata + "/images/" + image_name + ".jpg --colors --fill --color-depth=8")
         f.close()
         return (True)
     except IOError:
@@ -355,7 +368,7 @@ def display_image(image_name):
 # displays a markdown page
 def display_markdown(md_name):
     try:
-        f = open("quests/" + md_name + ".md","r")
+        f = open(gamedata + "/quests/" + md_name + ".md","r")
         md = Markdown(f.read())
         console.print(md)
         f.close()
@@ -366,15 +379,16 @@ def display_markdown(md_name):
 
 # parses the JSON based configuration file and creature objects from that configuration, requires json
 def load_data():
-    url = 'https://github.com/benjamin-bk-krueger/2021-kringlecon/raw/main/2021-kringlecon.zip'
-    urllib.request.urlretrieve(url, r'./gamedata.zip')
-    with ZipFile('./gamedata.zip', 'r') as zip:
-        zip.extractall()
+    if (not os.path.exists(gamedata)):
+        os.mkdir(gamedata) 
+        urllib.request.urlretrieve(gameurl, gamedata + "/gamedata.zip")
+        with ZipFile(gamedata + "/gamedata.zip", 'r') as zip:
+            zip.extractall(gamedata)
 
     global location
     counter = 1
     counter_loaded = 0
-    f = open("data.json")
+    f = open(gamedata + "/data.json")
     data = json.load(f)
     for i in data["rooms"]:
         room = Room()
@@ -470,6 +484,8 @@ def query_user():
         talk()
     elif (cmd == "phone"):
         phone()
+    elif (cmd == "urlrefresh"):
+        refresh_data()
     elif (cmd == "quit"):
         cont = 0
     elif (cmd == "walk"):
