@@ -14,6 +14,7 @@ from objective import Objective
 from junction import Junction
 from item import Item
 from character import Character
+from colors import bcolors
 
 cont = 1                # the program will run until this value is set to 0
 location = "start"      # the starting room, changes later in the game by walking around
@@ -25,7 +26,7 @@ items = dict()          # contains all available items
 characters = dict()     # contains all available side characters
 
 volcab = []             # contains autocomplete values
-default_actions = ['beam','cry','exit','grab','help','inspect','look','meditate','phone','quit','recap','scrutinize','talk','walk'] # default actions
+default_actions = ['beam','cry','exit','grab','help','inspect','look','meditate','phone','question','recap','talk','walk'] # default actions
 
 console = Console()     # markdown output to console
 
@@ -38,33 +39,36 @@ gameurl = 'https://white.blk8.de/kringle_gamedata/2021-kringlecon.zip' # url for
 def arrive():
     display_image("logo")
     print("")
-    print("You are arriving at a strange and unknown location.")
+    print (f"You are arriving at a {bcolors.HEADER}strange and unknown location{bcolors.ENDC}.")
     print("You are feeling a little dizzy.")
-    print("What should be your next steps? You are pausing for a moment.")
+    print(f"What should be your {bcolors.OKGREEN}next steps{bcolors.ENDC}? You are pausing for a moment.")
     rooms[location].visited = True
 
 # get some about information - "scrutinize" command assigned
-def scrutinize():
-    print("A magical voice whispers into your ear:")
-    print("\"This game has been created by Ben Krueger\"")
+def question():
+    print("A low voice whispers into your ear:")
+    print(f"{bcolors.FAIL}This game has been created by Ben Krueger{bcolors.ENDC}")
     print("You wonder what this may mean? You are inside a game? Strange thought indeed!")
 
 # triggered automatically when the player enters a wrong command - no command assigned
 def lost():
-    print("You are feeling lost somehow. You could cry for help to see what happens.")
+    print(f"You are {bcolors.HEADER}feeling lost{bcolors.ENDC} somehow. You could {bcolors.OKGREEN}cry{bcolors.ENDC} for help to see what happens.")
 
 # shows all available commands - "help" command assigned
 def help():
-    print("A magical voice whispers into your ear: \"Following commands are available:\"")
-    print(default_actions)
+    print(f"A low voice whispers into your ear: {bcolors.FAIL}Following commands are available:{bcolors.ENDC}")
+    for i in default_actions:
+        print(bcolors.BOLD + i[0:1] + bcolors.ENDC, end ="")
+        print(i[1:], end =", ")
     print("")
-    print("Then it whispers: \"TAB is your friend\"")
-    print("You wonder what this TAB may be? A creature? A scroll?")
+    print("")
+    print(f"Then it whispers: {bcolors.FAIL}TAB is your friend{bcolors.ENDC}")
+    print(f"You wonder what this {bcolors.OKGREEN}TAB{bcolors.ENDC} may be? A creature? An item?")
 
 # set all rooms, objectives, items, etc. to status visited/taken - HIDDEN "cheat" command assigned
 def cheat():
-    print("Suddenly you hear a rolling thunder all around you. You quickly close your eyes and open them again after a few seconds.")
-    print("Has anything happened? No? How strange you think and decide to carry on.")
+    print(f"Suddenly you hear a {bcolors.HEADER}rolling thunder{bcolors.ENDC} all around you. You quickly close your eyes and open them again after a few seconds.")
+    print(f"{bcolors.OKGREEN}Has anything happened{bcolors.ENDC}? No? How strange you think and decide to carry on.")
     for name, room in rooms.items():
         room.visited = True
     for name, objective in objectives.items():
@@ -74,7 +78,8 @@ def cheat():
 
 # fetch the configuration again from the default URL - HIDDEN "urlrefresh" command assigned
 def refresh_data():
-    print("")
+    print(f"You turn around and {bcolors.HEADER}clap your hands{bcolors.ENDC} three times.")
+    print(f"What is, has passed. {bcolors.OKGREEN}What could be will happen{bcolors.ENDC}.") 
     shutil.rmtree(gamedata)
     os.mkdir(gamedata) 
     urllib.request.urlretrieve(gameurl, gamedata + "/gamedata.zip")
@@ -83,12 +88,12 @@ def refresh_data():
 
 # have a detailed look what kind of objects a room contains - "inspect" command assigned
 def inspect():
-    print("You are inspecting the place and looking for further objects you can interact with...")
+    print(f"You are {bcolors.HEADER}inspecting the place{bcolors.ENDC} and looking for further objects you can interact with...")
     print("")
 
     for name, objective in objectives.items():
         if (objective.location == location):
-            print("In this room you can see " + name + ", " + objective.description + ".")
+            print("In this room you can see " + bcolors.OKBLUE + name + bcolors.ENDC + ", " + objective.description + ".")
             if (objective.supports == "main"):
                 print("    " + name + " seems to know something about a main objective.")
             else:
@@ -458,39 +463,35 @@ def load_data():
 def query_user():
     global cont
     print("")
-    cmd = input("I want to > ")
+    cmd = input(f"{bcolors.GREYBG}I want to >{bcolors.ENDC} ")
     print("")
-    if (cmd == "help"):
-        help()
     if (cmd == "cheat"):
         cheat()
-    elif (cmd == "cry"):
+    elif (cmd == "cry" or cmd == "c"):
         help()
-    elif (cmd == "beam"):
+    elif (cmd == "beam" or cmd == "b"):
         beam()
-    elif (cmd == "exit"):
+    elif (cmd == "exit" or cmd == "e"):
         cont = 0
-    elif (cmd == "grab"):
+    elif (cmd == "grab" or cmd == "g"):
         grab()
-    elif (cmd == "inspect"):
+    elif (cmd == "inspect") or cmd == "i":
         inspect()
-    elif (cmd == "look"):
+    elif (cmd == "look" or cmd == "l"):
         look()
-    elif (cmd == "meditate"):
+    elif (cmd == "meditate" or cmd == "m"):
         meditate()
-    elif (cmd == "recap"):
+    elif (cmd == "recap" or cmd == "r"):
         recap()
-    elif (cmd == "scrutinize"):
-        scrutinize()
-    elif (cmd == "talk"):
+    elif (cmd == "talk" or cmd == "t"):
         talk()
-    elif (cmd == "phone"):
+    elif (cmd == "phone" or cmd == "p"):
         phone()
     elif (cmd == "urlrefresh"):
         refresh_data()
-    elif (cmd == "quit"):
-        cont = 0
-    elif (cmd == "walk"):
+    elif (cmd == "question" or cmd == "q"):
+        question()
+    elif (cmd == "walk" or cmd == "w"):
         walk()
     else:
         lost()
