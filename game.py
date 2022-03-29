@@ -26,7 +26,7 @@ items = dict()          # contains all available items
 characters = dict()     # contains all available side characters
 
 volcab = []             # contains autocomplete values
-default_actions = ['beam','cry','exit','grab','help','inspect','look','meditate','phone','question','recap','talk','walk'] # default actions
+default_actions = ['beam','cry','exit','grab','inspect','look','meditate','phone','question','recap','talk','walk'] # default actions
 
 console = Console()     # markdown output to console
 
@@ -124,8 +124,8 @@ def inspect():
 
 # think about the main quest in the game, triggered automatically when the player arrives - "meditate" command assigned
 def meditate():
-    print(f"A quest to save Santa{bcolors.ENDC} has brought you to this place.")
-    print("You think about how all those creatures here could help you.")
+    print(f"A quest to {bcolors.HEADER}save Santa{bcolors.ENDC} has brought you to this place.")
+    print("You think about how all those characters here could help you.")
 
 # have a quick look at this place - "look" command assigned
 def look():
@@ -313,9 +313,9 @@ def recap():
     for name, item in items.items():
         if (item.visited):
             counter_i = counter_i + 1
-    print(f"You {bcolors.GREENFG}have visited{bcolors.ENDC} {str(counter_r)} room(s). You feel like there is/are {str(len(rooms) - counter_r)} more to discover.")
-    print(f"You {bcolors.GREENFG}have talked{bcolors.ENDC} to {str(counter_o)} creature(s). You guess there is/are {str(len(objectives) - counter_o)} more waiting for contact.")
-    print(f"You {bcolors.GREENFG}have grabbed{bcolors.ENDC} {str(counter_i)} item(s). Maybe you can put {str(len(items) - counter_i)} additional one(s) into your bag.")
+    print(f"You {bcolors.HEADER}have visited{bcolors.ENDC} {str(counter_r)} room(s). You feel like there is/are {str(len(rooms) - counter_r)} more to discover.")
+    print(f"You {bcolors.HEADER}have talked{bcolors.ENDC} to {str(counter_o)} creature(s). You guess there is/are {str(len(objectives) - counter_o)} more waiting for contact.")
+    print(f"You {bcolors.HEADER}have grabbed{bcolors.ENDC} {str(counter_i)} item(s). Maybe you can put {str(len(items) - counter_i)} additional one(s) into your bag.")
     
 # helper functions, cannot be triggered by the player directly
 # resets the auto-completion to the default actions list
@@ -330,35 +330,38 @@ def set_custom_complete(list):
 
 # basic yes no question
 def yesno():
-    answer = input("You are saying yes or no > ")
+    answer = input(f"{bcolors.GREYBG}I am saying yes ------>{bcolors.ENDC} ")
     if (answer == "yes" or answer == "y"):
         return True
     else:
         return False
 
-# talk to a creature
+# talk to a character
 def talk_to(name, url):
-    print("You are talking to " + name)
+    print("")
+    print(f"You are talking to {bcolors.BLUEFG}{name}{bcolors.ENDC}")
     display_image(name)
 
     if (objectives[name].requires != "none" and not items[objectives[name].requires].visited):
         print("")
-        print(name + " asks for a " + objectives[name].requires + ". Sadly you can't find it in your bag.")
+        print(f"{bcolors.BLUEFG}{name}{bcolors.ENDC} asks for a {bcolors.BLUEFG}{objectives[name].requires}{bcolors.ENDC}. Sadly you can't find it in your bag.")
     else:
         print("")
-        print(name + " gives you following quest:")
+        print(f"{bcolors.BLUEFG}{name}{bcolors.ENDC} gives you following quest:")
         display_markdown(name + "_q")
                         
         print("")
-        print(name + " asks you if you want to open this quest.")
+        print(f"{bcolors.BLUEFG}{name}{bcolors.ENDC} asks you if you want to open this quest.")
+        print("")
         if (yesno()):
             # webbrowser.open(url, new=1)
             print("")
             print(url)
 
         print("")
-        print("After a short while " + name + " also offers you the solution.")
+        print(f"After a short while {bcolors.BLUEFG}{name}{bcolors.ENDC} also offers you the solution.")
         print("Do you want to hear it?")
+        print("")
         if (yesno()):
             display_markdown(name + "_a")
 
@@ -375,7 +378,7 @@ def display_image(image_name):
         f.close()
         return (True)
     except IOError:
-        print("Image file not found for " + image_name)
+        print(f"Image file not found for {image_name}")
         return (False)
 
 # displays a markdown page
@@ -387,7 +390,7 @@ def display_markdown(md_name):
         f.close()
         return (True)
     except IOError:
-        print("Markdown file not found for " + md_name)
+        print(f"Markdown file not found for {md_name}")
         return (False)
 
 # parses the JSON based configuration file and creature objects from that configuration, requires json
