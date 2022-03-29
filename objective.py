@@ -12,9 +12,9 @@ class Objective(Object):
         self.__url = url
     def get_url(self):
         return self.__url
-    def set_supports(self, supports):
+    def set_supportedby(self, supports):
         self.__supports = supports
-    def get_supports(self):
+    def get_supportedby(self):
         return self.__supports
     def set_requires(self, requires):
         self.__requires = requires
@@ -24,5 +24,5 @@ class Objective(Object):
     
     difficulty = property(get_difficulty, set_difficulty)
     url = property(get_url, set_url)
-    supports = property(get_supports, set_supports)
+    supportedby = property(get_supportedby, set_supportedby)
     requires = property(get_requires, set_requires)

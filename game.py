@@ -41,34 +41,34 @@ def arrive():
     print("")
     print (f"You are arriving at a {bcolors.HEADER}strange and unknown location{bcolors.ENDC}.")
     print("You are feeling a little dizzy.")
-    print(f"What should be your {bcolors.OKGREEN}next steps{bcolors.ENDC}? You are pausing for a moment.")
+    print(f"What should be your {bcolors.GREENFG}next steps{bcolors.ENDC}? You are pausing for a moment.")
     rooms[location].visited = True
 
 # get some about information - "scrutinize" command assigned
 def question():
     print("A low voice whispers into your ear:")
-    print(f"{bcolors.FAIL}This game has been created by Ben Krueger{bcolors.ENDC}")
+    print(f"{bcolors.YELLOWFG}This game has been created by Ben Krueger{bcolors.ENDC}")
     print("You wonder what this may mean? You are inside a game? Strange thought indeed!")
 
 # triggered automatically when the player enters a wrong command - no command assigned
 def lost():
-    print(f"You are {bcolors.HEADER}feeling lost{bcolors.ENDC} somehow. You could {bcolors.OKGREEN}cry{bcolors.ENDC} for help to see what happens.")
+    print(f"You are {bcolors.HEADER}feeling lost{bcolors.ENDC} somehow. You could {bcolors.GREENFG}cry{bcolors.ENDC} for help to see what happens.")
 
 # shows all available commands - "help" command assigned
 def help():
-    print(f"A low voice whispers into your ear: {bcolors.FAIL}Following commands are available:{bcolors.ENDC}")
+    print(f"A low voice whispers into your ear: {bcolors.YELLOWFG}Following commands are available:{bcolors.ENDC}")
     for i in default_actions:
         print(bcolors.BOLD + i[0:1] + bcolors.ENDC, end ="")
         print(i[1:], end =", ")
     print("")
     print("")
-    print(f"Then it whispers: {bcolors.FAIL}TAB is your friend{bcolors.ENDC}")
-    print(f"You wonder what this {bcolors.OKGREEN}TAB{bcolors.ENDC} may be? A creature? An item?")
+    print(f"Then it whispers: {bcolors.YELLOWFG}TAB is your friend{bcolors.ENDC}")
+    print(f"You wonder what this {bcolors.GREENFG}TAB{bcolors.ENDC} may be? A creature? An item?")
 
 # set all rooms, objectives, items, etc. to status visited/taken - HIDDEN "cheat" command assigned
 def cheat():
     print(f"Suddenly you hear a {bcolors.HEADER}rolling thunder{bcolors.ENDC} all around you. You quickly close your eyes and open them again after a few seconds.")
-    print(f"{bcolors.OKGREEN}Has anything happened{bcolors.ENDC}? No? How strange you think and decide to carry on.")
+    print(f"{bcolors.GREENFG}Has anything happened{bcolors.ENDC}? No? How strange you think and decide to carry on.")
     for name, room in rooms.items():
         room.visited = True
     for name, objective in objectives.items():
@@ -79,7 +79,7 @@ def cheat():
 # fetch the configuration again from the default URL - HIDDEN "urlrefresh" command assigned
 def refresh_data():
     print(f"You turn around and {bcolors.HEADER}clap your hands{bcolors.ENDC} three times.")
-    print(f"What is, has passed. {bcolors.OKGREEN}What could be will happen{bcolors.ENDC}.") 
+    print(f"What is, has passed. {bcolors.GREENFG}What could be, will happen{bcolors.ENDC}.") 
     shutil.rmtree(gamedata)
     os.mkdir(gamedata) 
     urllib.request.urlretrieve(gameurl, gamedata + "/gamedata.zip")
@@ -93,45 +93,43 @@ def inspect():
 
     for name, objective in objectives.items():
         if (objective.location == location):
-            print("In this room you can see " + bcolors.OKBLUE + name + bcolors.ENDC + ", " + objective.description + ".")
-            if (objective.supports == "main"):
-                print("    " + name + " seems to know something about a main objective.")
-            else:
-                print("    " + name + " can you give some hints for the quest " + objective.supports + " is offering.")
+            print(f"In this room you can see {bcolors.BLUEFG}{name}{bcolors.ENDC} {objective.description}.")
+            if (objective.supportedby != "none"):
+                print(f"|- {objective.supportedby} can you give some hints for this quest.")
             if (objective.visited):
-                print("    " + "You already have talked to " + name + " before.")
+                print(f"`- You {bcolors.GREENFG}already have talked{bcolors.ENDC} to {name} before.")
             else:
-                print("    " + "You have not talked to " + name + " yet.")
+                print(f"`- You have {bcolors.REDFG}not talked{bcolors.ENDC} to {name} yet.")
             print("")
 
     for name, item in items.items():
         if (item.location == location):
             if (not item.visited):
-                print("In a corner you can see a " + name + " lying around. You guess it's a " + item.description + ".")
+                print(f"In a corner you can see a {bcolors.BLUEFG}{name}{bcolors.ENDC} lying around. You guess it's a {item.description}.")
                 print("")
 
     for name, character in characters.items():
         if (character.location == location):
-            print("Furthermore you can see " + name + ", " + character.description)
+            print(f"Furthermore you can see {bcolors.BLUEFG}{name}{bcolors.ENDC} {character.description}")
             print("")
 
     for name, junction in junctions.items():
         if (junction.location == location):
-            print(junction.description + " you can see a junction to " + junction.destination)
+            print(f"{junction.description} you can see a junction to {bcolors.BLUEFG}{junction.destination}{bcolors.ENDC}.")
             if (rooms[junction.destination].visited):
-                print ("    " + "You have visited that location already.")
+                print (f"`- You {bcolors.GREENFG}have visited{bcolors.ENDC} that location already.")
             else:
-                print ("    " + "You have not seen that location yet.")
+                print (f"`- You {bcolors.REDFG}have not seen{bcolors.ENDC} that location yet.")
             print("")
 
 # think about the main quest in the game, triggered automatically when the player arrives - "meditate" command assigned
 def meditate():
-    print("A quest to save Santa has brought you to this place.")
+    print(f"A quest to save Santa{bcolors.ENDC} has brought you to this place.")
     print("You think about how all those creatures here could help you.")
 
 # have a quick look at this place - "look" command assigned
 def look():
-    print("You are currently at " + location + " and admiring what your eyes can see...")
+    print(f"You are currently at {bcolors.BLUEFG}{location}{bcolors.ENDC} and {bcolors.HEADER}admiring{bcolors.ENDC} what your eyes can see...")
     print("")
     display_image(location)
     print("")
@@ -143,10 +141,9 @@ def phone():
     global volcab
     new_volcab = []
 
-    print("You put your hand into your right pocket and grab a magical device.")
+    print(f"You put your hand into your right pocket and {bcolors.HEADER}grab a magical device{bcolors.ENDC}.")
     print("It has a display where you can see the names of all the creatures you had contact with.")
-    print("You guess you can open some channel to a creature by tapping its name.")
-    print("")
+    print(f"You guess you can {bcolors.GREENFG}open some channel{bcolors.ENDC} to a creature by tapping its name.")
 
     # assign all visited creatures to the auto-completion list
     counter = 0
@@ -154,20 +151,21 @@ def phone():
         if (objective.visited):
             counter = counter + 1
             new_volcab.append(name)
-            print("  Entry: " + name)
+            print(f"|- {name}")
 
     if (counter > 0):
         set_custom_complete(new_volcab)
         print("")
-        name = input("I want to talk to > ")
+        name = input(f"{bcolors.GREYBG}I want to talk to ---->{bcolors.ENDC} ")
         if (name in objectives):
             objectives[name].visited = True
             talk_to(name, objectives[name].url)
         else:
             print("")
-            print("You decide you don't want to talk right now.")
+            print(f"You decide you {bcolors.REDFG}don't want to talk{bcolors.ENDC} right now.")
     else:
-        print("After a moment you realize you have not met anyone yet.")
+        print("")
+        print(f"After a moment you realize you have {bcolors.REDFG}not met anyone{bcolors.ENDC} yet.")
     set_default_complete()
     
 # talk to other creatures - "talk" command assigned
@@ -176,26 +174,29 @@ def talk():
     global volcab
     new_volcab = []
 
+    print(f"You {bcolors.HEADER}look around{bcolors.ENDC} for other characters in this room.")
+
     # assign all creatures in this room to the auto-completion list
     counter = 0
     for name, objective in objectives.items():
         if (objective.location == location):
             counter = counter + 1
             new_volcab.append(name)
-            print("  Entry: " + name)
+            print(f"|- {name}")
 
     if (counter > 0):
         set_custom_complete(new_volcab)
         print("")
-        name = input("I want to talk to > ")
+        name = input(f"{bcolors.GREYBG}I want to talk to ---->{bcolors.ENDC} ")
         if (name in objectives):
             objectives[name].visited = True
             talk_to(name, objectives[name].url)
         else:
             print("")
-            print("You decide you don't want to talk right now.")
+            print(f"You decide you {bcolors.REDFG}don't want to talk{bcolors.ENDC} right now.")
     else:
-        print("After a moment you realize no one is in this room.")
+        print("")
+        print(f"After a moment you realize {bcolors.REDFG}no one is in this room{bcolors.ENDC}.")
     set_default_complete()
 
 # beam to places you already have discovered - "beam" command assigned
@@ -205,10 +206,9 @@ def beam():
     global location
     new_volcab = []
 
-    print("You put your hand into your left pocket and grab a magical device.")
+    print(f"You put your hand into your left pocket and {bcolors.HEADER}grab a magical device{bcolors.ENDC}.")
     print("It has a display where you can see the names of all the places you have visited.")
-    print("You guess you can travel there by tapping its name.")
-    print("")
+    print(f"You guess you can {bcolors.GREENFG}travel there{bcolors.ENDC} by tapping its name.")
 
     # assign all visited rooms to the auto-completion list
     counter = 0
@@ -216,21 +216,22 @@ def beam():
         if (room.visited):
             counter = counter + 1
             new_volcab.append(name)
-            print("  Entry: " + name)
+            print(f"|- {name}")
 
     if (counter > 0):
         set_custom_complete(new_volcab)
         print("")
-        destination = input("I want to go to > ")
+        destination = input(f"{bcolors.GREYBG}I want to go to ------>{bcolors.ENDC} ")
         if (location != destination and destination in rooms):
             print("")
-            print("You are going to " + destination)
+            print(f"You are {bcolors.GREENFG}going to{bcolors.ENDC} {destination}")
             location = destination
         else:
             print("")
-            print("You decide to stay where you currently are.")
+            print(f"You decide to {bcolors.REDFG}stay{bcolors.ENDC} where you currently are.")
     else:
-        print("After a moment you realize you have not been anywhere yet.")
+        print("")
+        print(f"After a moment you realize you {bcolors.REDFG}have not been anywhere yet{bcolors.ENDC}.")
     set_default_complete()
 
 # walk to other places - "walk" command assigned
@@ -240,28 +241,30 @@ def walk():
     global location
     new_volcab = []
 
+    print(f"You {bcolors.HEADER}look around{bcolors.ENDC} for other places to reach.")
+
     # assign all connected rooms to the auto-completion list
     counter = 0
     for id, junction in junctions.items():
         if (junction.location == location):
             counter = counter + 1
             new_volcab.append(junction.destination)
-            print("  Entry: " + junction.destination)
+            print(f"|- {junction.destination}")
 
     if (counter > 0):
         set_custom_complete(new_volcab)
         print ("")
-        destination = input("I want to go to > ")
+        destination = input(f"{bcolors.GREYBG}I want to go to ------>{bcolors.ENDC} ")
         if (location != destination and destination in rooms):
             print("")
-            print("You are going to " + destination)
+            print(f"You are {bcolors.GREENFG}going to{bcolors.ENDC} {destination}")
             location = destination
             rooms[destination].visited = True
         else:
             print("")
-            print("You decide to stay where you currently are.")
+            print(f"You decide to {bcolors.REDFG}stay{bcolors.ENDC} where you currently are.")
     else:
-        print("After a moment you realize there is no way out of this room.")
+        print(f"After a moment you realize there is {bcolors.REDFG}no way out{bcolors.ENDC} of this room.")
     set_default_complete()
 
 # grab an item - "grab" command assigned
@@ -270,27 +273,30 @@ def grab():
     global volcab
     new_volcab = []
 
+    print(f"You {bcolors.HEADER}look around{bcolors.ENDC} for things to grab.")
+
     # assign all items in this room to the auto-completion list
     counter = 0
     for name, item in items.items():
         if (item.location == location and item.visited is not True):
             counter = counter + 1
             new_volcab.append(name)
-            print("  Entry: " + name)
+            print(f"|- {name}")
 
     if (counter > 0):
         set_custom_complete(new_volcab)
         print("")
-        name = input("I want to grab > ")
+        name = input(f"{bcolors.GREYBG}I want to grab ------->{bcolors.ENDC} ")
         if (name in items):
             items[name].visited = True
             print("")
-            print("You grab the " + name + " and put it into your bag.")
+            print(f"You grab the {name} and {bcolors.GREENFG}put it into your bag{bcolors.ENDC}.")
         else:
             print("")
-            print("You decide you don't want to grab anything right now.")
+            print(f"You decide you {bcolors.REDFG}don't want to grab{bcolors.ENDC} anything right now.")
     else:
-        print("After a moment you realize no items can be found in this room.")
+        print("")
+        print(f"After a moment you realize {bcolors.REDFG}no items can be found{bcolors.ENDC} in this room.")
     set_default_complete()
 
 # check everything you have encountered - "recap" command assigned
@@ -307,9 +313,9 @@ def recap():
     for name, item in items.items():
         if (item.visited):
             counter_i = counter_i + 1
-    print("You have visited " + str(counter_r) + " room(s). You feel like there is/are " + str(len(rooms) - counter_r) + " more to discover.")
-    print("You have talked to " + str(counter_o) + " creature(s). You guess there is/are " + str(len(objectives) - counter_o) + " more waiting for contact.")
-    print("You have grabbed " + str(counter_i) + " item(s). Maybe you can put " + str(len(items) - counter_i) + " additional one(s) into your bag.")
+    print(f"You {bcolors.GREENFG}have visited{bcolors.ENDC} {str(counter_r)} room(s). You feel like there is/are {str(len(rooms) - counter_r)} more to discover.")
+    print(f"You {bcolors.GREENFG}have talked{bcolors.ENDC} to {str(counter_o)} creature(s). You guess there is/are {str(len(objectives) - counter_o)} more waiting for contact.")
+    print(f"You {bcolors.GREENFG}have grabbed{bcolors.ENDC} {str(counter_i)} item(s). Maybe you can put {str(len(items) - counter_i)} additional one(s) into your bag.")
     
 # helper functions, cannot be triggered by the player directly
 # resets the auto-completion to the default actions list
@@ -437,7 +443,7 @@ def load_data():
                 objective.location = i["name"]
                 objective.difficulty = j["difficulty"]
                 objective.url = j["url"]
-                objective.supports = j["supports"]
+                objective.supportedby = j["supportedby"]
                 objective.requires = j["requires"]
                 objectives.update({j["name"]: objective})
                 counter_loaded = counter_loaded + 1
@@ -463,7 +469,7 @@ def load_data():
 def query_user():
     global cont
     print("")
-    cmd = input(f"{bcolors.GREYBG}I want to >{bcolors.ENDC} ")
+    cmd = input(f"{bcolors.GREYBG}I want to ------------>{bcolors.ENDC} ")
     print("")
     if (cmd == "cheat"):
         cheat()
