@@ -348,6 +348,7 @@ def talk_to(name, url):
     else:
         print("")
         print(f"{bcolors.BLUEFG}{name}{bcolors.ENDC} gives you following quest:")
+        print("")
         display_markdown(name + "_q")
                         
         print("")
@@ -363,6 +364,7 @@ def talk_to(name, url):
         print("Do you want to hear it?")
         print("")
         if (yesno()):
+            print("")
             display_markdown(name + "_a")
 
 # auto-completion with Python readline, requires readline
