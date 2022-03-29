@@ -120,3 +120,8 @@ Modified the Github Action so it will deploy the images to the VPS and run the d
 
 Providing static game data (images, quests) might not be the best idea. So I put all that files into a ZIP file located in another public repository. The game is now able to fetch that file and parse the extracted files.  
 This way providing updated game data or another completely different scenario is possible without re-deploying the application.
+
+***2022-03-29***
+
+Added some colors to the game by using ANSI codes.  
+All the game texts are much easier to read now.

@@ -120,7 +120,6 @@ def inspect():
                 print (f"`- You {bcolors.GREENFG}have visited{bcolors.ENDC} that location already.")
             else:
                 print (f"`- You {bcolors.REDFG}have not seen{bcolors.ENDC} that location yet.")
-            print("")
 
 # think about the main quest in the game, triggered automatically when the player arrives - "meditate" command assigned
 def meditate():
