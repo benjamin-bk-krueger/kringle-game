@@ -427,10 +427,18 @@ def load_data():
         print("You are connected to - ", record, "\n")
 
         for i in data["rooms"]:
+            room_id = counter_loaded
+            room_name = i["name"]
+            room_desc = i["description"]
+
             room = Room()
-            room.description = i["description"]
-            rooms.update({i["name"]: room})
+            room.description = room_desc
+            rooms.update({room_name: room})
             counter_loaded = counter_loaded + 1
+
+            insert_query = f"INSERT INTO room (room_id, room_name, room_desc) VALUE ({room_id},{room_name},{room_desc})"
+            cursor.execute(insert_query)
+            connection.commit()
 
             # the first room is the starting location
             if (location == "start"):
