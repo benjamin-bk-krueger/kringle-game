@@ -592,16 +592,18 @@ def load_data():
             objectives.update({i[2]: objective})
             counter_loaded = counter_loaded + 1
 
-            # load all junctions in the room
-            #if "junctions" in i:
-            #    for j in i["junctions"]:
-            #        junction = Junction()
-            #        junction.destination = j["destination"]
-            #        junction.description = j["description"]
-            #        junction.location = i["name"]
-            #        junctions.update({counter: junction})
-            #        counter = counter + 1
-            #        counter_loaded = counter_loaded + 1
+        select_query = "select * from junction;"
+        cursor.execute(select_query)
+        junction_records = cursor.fetchall()
+
+        for i in person_records:
+            junction = Junction()
+            junction.destination = i[0]
+            junction.location = i[1]
+            junction.description = i[2]
+            junctions.update({counter: junction})
+            counter = counter + 1
+            counter_loaded = counter_loaded + 1
 
     except (Exception, Error) as error:
         print("Error while connecting to PostgreSQL", error)
