@@ -409,65 +409,94 @@ def load_data():
     counter_loaded = 0
     f = open(gamedata + "/data.json")
     data = json.load(f)
-    for i in data["rooms"]:
-        room = Room()
-        room.description = i["description"]
-        rooms.update({i["name"]: room})
-        counter_loaded = counter_loaded + 1
 
-        # the first room is the starting location
-        if (location == "start"):
-            location = i["name"]
-        
-        # load all items in the room
-        try:
-            for j in i["items"]:
-                item = Item()
-                item.description = j["description"]
-                item.location = i["name"]
-                items.update({j["name"]: item})
-                counter_loaded = counter_loaded + 1
-        except:
-            pass
-        
-        # load all characters in the room
-        try:
-            for j in i["characters"]:
-                character = Character()
-                character.description = j["description"]
-                character.location = i["name"]
-                characters.update({j["name"]: character})
-                counter_loaded = counter_loaded + 1
-        except:
-            pass
+    try:
+        # Connect to an existing database
+        connection = psycopg2.connect(user="postgres",
+                                    password="postgres",
+                                    host="kringle_database",
+                                    port="5432",
+                                    database="postgres")
 
-        # load all objectives in the room
-        try:
-            for j in i["objectives"]:
-                objective = Objective()
-                objective.description = j["description"]
-                objective.location = i["name"]
-                objective.difficulty = j["difficulty"]
-                objective.url = j["url"]
-                objective.supportedby = j["supportedby"]
-                objective.requires = j["requires"]
-                objectives.update({j["name"]: objective})
-                counter_loaded = counter_loaded + 1
-        except:
-            pass
+        # Create a cursor to perform database operations
+        cursor = connection.cursor()
+         # Print PostgreSQL details
+        print("PostgreSQL server information")
+        print(connection.get_dsn_parameters(), "\n")
+        # Executing a SQL query
+        cursor.execute("SELECT version();")
+        # Fetch result
+        record = cursor.fetchone()
+        print("You are connected to - ", record, "\n")
 
-        # load all junctions in the room
-        try:
-            for j in i["junctions"]:
-                junction = Junction()
-                junction.destination = j["destination"]
-                junction.description = j["description"]
-                junction.location = i["name"]
-                junctions.update({counter: junction})
-                counter = counter + 1
-                counter_loaded = counter_loaded + 1
-        except:
-            pass
+        for i in data["rooms"]:
+            room = Room()
+            room.description = i["description"]
+            rooms.update({i["name"]: room})
+            counter_loaded = counter_loaded + 1
+
+            # the first room is the starting location
+            if (location == "start"):
+                location = i["name"]
+            
+            # load all items in the room
+            try:
+                for j in i["items"]:
+                    item = Item()
+                    item.description = j["description"]
+                    item.location = i["name"]
+                    items.update({j["name"]: item})
+                    counter_loaded = counter_loaded + 1
+            except:
+                pass
+            
+            # load all characters in the room
+            try:
+                for j in i["characters"]:
+                    character = Character()
+                    character.description = j["description"]
+                    character.location = i["name"]
+                    characters.update({j["name"]: character})
+                    counter_loaded = counter_loaded + 1
+            except:
+                pass
+
+            # load all objectives in the room
+            try:
+                for j in i["objectives"]:
+                    objective = Objective()
+                    objective.description = j["description"]
+                    objective.location = i["name"]
+                    objective.difficulty = j["difficulty"]
+                    objective.url = j["url"]
+                    objective.supportedby = j["supportedby"]
+                    objective.requires = j["requires"]
+                    objectives.update({j["name"]: objective})
+                    counter_loaded = counter_loaded + 1
+            except:
+                pass
+
+            # load all junctions in the room
+            try:
+                for j in i["junctions"]:
+                    junction = Junction()
+                    junction.destination = j["destination"]
+                    junction.description = j["description"]
+                    junction.location = i["name"]
+                    junctions.update({counter: junction})
+                    counter = counter + 1
+                    counter_loaded = counter_loaded + 1
+            except:
+                pass
+
+    except (Exception, Error) as error:
+        print("Error while connecting to PostgreSQL", error)
+    finally:
+        if (connection):
+            cursor.close()
+            connection.close()
+            print("PostgreSQL connection is closed")
+    
     f.close()
     return(counter_loaded)
 
@@ -515,35 +544,6 @@ set_default_complete()
 readline.parse_and_bind("tab: complete") # Linux
 #readline.parse_and_bind ("bind ^I rl_complete") # Mac
 readline.set_completer(complete)
-
-
-try:
-    # Connect to an existing database
-    connection = psycopg2.connect(user="postgres",
-                                  password="postgres",
-                                  host="kringle_database",
-                                  port="5432",
-                                  database="postgres")
-
-    # Create a cursor to perform database operations
-    cursor = connection.cursor()
-    # Print PostgreSQL details
-    print("PostgreSQL server information")
-    print(connection.get_dsn_parameters(), "\n")
-    # Executing a SQL query
-    cursor.execute("SELECT version();")
-    # Fetch result
-    record = cursor.fetchone()
-    print("You are connected to - ", record, "\n")
-
-except (Exception, Error) as error:
-    print("Error while connecting to PostgreSQL", error)
-finally:
-    if (connection):
-        cursor.close()
-        connection.close()
-        print("PostgreSQL connection is closed")
-
 
 if __name__ == '__main__':
     # open the JSON data file and build all object dictionnaries
