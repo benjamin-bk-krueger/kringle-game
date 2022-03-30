@@ -541,10 +541,13 @@ def load_data():
         record = cursor.fetchone()
         print("You are connected to - ", record, "\n")
 
-        select_query = "select * from room"
+        select_query = "select * from room;"
+        cursor.execute(select_query)
         room_records = cursor.fetchall()
 
         for i in room_records:
+            subcursor = connection.cursor()
+
             room = Room()
             room.description = i[2]
             rooms.update({i[1]: room})
@@ -554,7 +557,50 @@ def load_data():
             if (location == "start"):
                 location = i[1]
             
-            
+            # load all items in the room
+            subselect_query = "select * from item where room_id = " + i[0] + ";"
+            subcursor.execute(subselect_query)
+            item_records = subcursor.fetchall()
+
+            for j in item_records:
+                item = Item()
+                item.description = j[3]
+                item.location = i[1]
+                items.update({j[2]: item})
+                counter_loaded = counter_loaded + 1
+
+            # load all characters in the room
+            #if "characters" in i:
+            #    for j in i["characters"]:
+            #        character = Character()
+            #        character.description = j["description"]
+            #        character.location = i["name"]
+            #        characters.update({j["name"]: character})
+            #        counter_loaded = counter_loaded + 1
+
+            # load all objectives in the room
+            #if "objectives" in i:
+            #    for j in i["objectives"]:
+            #        objective = Objective()
+            #        objective.description = j["description"]
+            #        objective.location = i["name"]
+            #        objective.difficulty = j["difficulty"]
+            #        objective.url = j["url"]
+            #        objective.supportedby = j["supportedby"]
+            #        objective.requires = j["requires"]
+            #        objectives.update({j["name"]: objective})
+            #        counter_loaded = counter_loaded + 1
+
+            # load all junctions in the room
+            #if "junctions" in i:
+            #    for j in i["junctions"]:
+            #        junction = Junction()
+            #        junction.destination = j["destination"]
+            #        junction.description = j["description"]
+            #        junction.location = i["name"]
+            #        junctions.update({counter: junction})
+            #        counter = counter + 1
+            #        counter_loaded = counter_loaded + 1
 
     except (Exception, Error) as error:
         print("Error while connecting to PostgreSQL", error)
