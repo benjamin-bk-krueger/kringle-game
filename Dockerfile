@@ -6,11 +6,10 @@ LABEL maintaner="Ben Krueger <sayhello@blk8.de>"
 #LABEL promoted="true"
 
 RUN apt-get update
-RUN apt-get install -y python3 python3-pip jp2a whois
+RUN apt-get install -y python3 python3-pip psycopg2-binary jp2a whois
 RUN DEBIAN_FRONTEND=noninteractive  apt-get install -y ssh
 
 RUN pip3 install rich
-RUN pip3 install psycopg2
 
 RUN apt-get clean
 RUN rm -rf /var/lib/apt/lists/*
