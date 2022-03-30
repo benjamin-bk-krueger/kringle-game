@@ -665,10 +665,14 @@ if __name__ == '__main__':
     load_data()
 
     # start the game until the player decides to quit
-    print("")
-    arrive()
-    print("")
-    meditate()
+    if len(rooms) > 0:
+        print("")
+        arrive()
+        print("")
+        meditate()
+    else:
+        print("")
+        print("You are looking at a green field.")
 
     while (cont == 1):
         query_user()
