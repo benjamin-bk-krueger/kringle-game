@@ -4,10 +4,12 @@ import readline         # necessary to be able to auto-complete user
 # import webbrowser     # necessary to display web pages
 import urllib.request   # necessary to download game data
 import shutil           # necessary to recursively delete files
+import psycopg2         # necessary to connect to PostGreSQL database
 
 from rich.console import Console    # necessary for markdown display
 from rich.markdown import Markdown  # necessary for markdown display
 from zipfile import ZipFile         # necessary for ZIP handling
+from psycopg2 import Error          # necessary for DB error handling
 
 from room import Room
 from objective import Objective
@@ -513,6 +515,35 @@ set_default_complete()
 readline.parse_and_bind("tab: complete") # Linux
 #readline.parse_and_bind ("bind ^I rl_complete") # Mac
 readline.set_completer(complete)
+
+
+try:
+    # Connect to an existing database
+    connection = psycopg2.connect(user="postgres",
+                                  password="postgres",
+                                  host="kringle_database",
+                                  port="5432",
+                                  database="postgres")
+
+    # Create a cursor to perform database operations
+    cursor = connection.cursor()
+    # Print PostgreSQL details
+    print("PostgreSQL server information")
+    print(connection.get_dsn_parameters(), "\n")
+    # Executing a SQL query
+    cursor.execute("SELECT version();")
+    # Fetch result
+    record = cursor.fetchone()
+    print("You are connected to - ", record, "\n")
+
+except (Exception, Error) as error:
+    print("Error while connecting to PostgreSQL", error)
+finally:
+    if (connection):
+        cursor.close()
+        connection.close()
+        print("PostgreSQL connection is closed")
+
 
 if __name__ == '__main__':
     # open the JSON data file and build all object dictionnaries
