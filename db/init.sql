@@ -18,8 +18,8 @@ CREATE TABLE objective (
     objective_desc VARCHAR ( 1024 ),
     difficulty INT,
     objective_url VARCHAR ( 256 ),
-    supported_by INT REFERENCES objective (objective_id),
-    requires INT REFERENCES item (item_id)
+    supported_by VARCHAR ( 100 ),
+    requires VARCHAR ( 100 )
 );
 
 CREATE TABLE person (
@@ -30,7 +30,7 @@ CREATE TABLE person (
 );
 
 CREATE TABLE junction (
-    destination INT REFERENCES room (room_id),
+    destination VARCHAR ( 100 ),
     room_id INT REFERENCES room (room_id),
     junction_desc VARCHAR ( 1024 )
 );

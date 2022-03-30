@@ -176,10 +176,10 @@ def refresh_data():
                     objective_id = counter_objective
                     objective_name = j["name"]
                     objective_desc = j["description"]
-                    difficulty = ["difficulty"]
+                    difficulty = j["difficulty"]
                     objective_url = j["url"]
-                    supported_by = 1
-                    requires = 1
+                    supported_by = j["supportedby"]
+                    requires = j["requires"]
 
                     insert_query = "INSERT INTO objective (objective_id, room_id, objective_name, objective_desc, difficulty, objective_url, supported_by, requires) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"
                     cursor.execute(insert_query, (objective_id, room_id, objective_name, objective_desc, difficulty, objective_url, supported_by, requires))
@@ -191,7 +191,7 @@ def refresh_data():
             # load all junctions in the room
             if "junctions" in i:
                 for j in i["junctions"]:
-                    destination = 1
+                    destination = j["destination"]
                     junction_desc = j["description"]
 
                     insert_query = "INSERT INTO junction (destination, room_id, junction_desc) VALUES (%s, %s, %s);"
@@ -571,29 +571,25 @@ def load_data():
                 location = i["name"]
             
             # load all items in the room
-            try:
+            if "items" in i:
                 for j in i["items"]:
                     item = Item()
                     item.description = j["description"]
                     item.location = i["name"]
                     items.update({j["name"]: item})
                     counter_loaded = counter_loaded + 1
-            except:
-                pass
-            
+
             # load all characters in the room
-            try:
+            if "characters" in i:
                 for j in i["characters"]:
                     character = Character()
                     character.description = j["description"]
                     character.location = i["name"]
                     characters.update({j["name"]: character})
                     counter_loaded = counter_loaded + 1
-            except:
-                pass
 
             # load all objectives in the room
-            try:
+            if "objectives" in i:
                 for j in i["objectives"]:
                     objective = Objective()
                     objective.description = j["description"]
@@ -604,11 +600,9 @@ def load_data():
                     objective.requires = j["requires"]
                     objectives.update({j["name"]: objective})
                     counter_loaded = counter_loaded + 1
-            except:
-                pass
 
             # load all junctions in the room
-            try:
+            if "junctions" in i:
                 for j in i["junctions"]:
                     junction = Junction()
                     junction.destination = j["destination"]
@@ -617,8 +611,6 @@ def load_data():
                     junctions.update({counter: junction})
                     counter = counter + 1
                     counter_loaded = counter_loaded + 1
-            except:
-                pass
 
     except (Exception, Error) as error:
         print("Error while connecting to PostgreSQL", error)
