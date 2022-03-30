@@ -406,6 +406,7 @@ def load_data():
 
     global location
     counter = 1
+    counter_room = 1
     counter_loaded = 0
     f = open(gamedata + "/data.json")
     data = json.load(f)
@@ -427,18 +428,20 @@ def load_data():
         print("You are connected to - ", record, "\n")
 
         for i in data["rooms"]:
-            room_id = counter_loaded
+            room_id = counter_room
             room_name = i["name"]
             room_desc = i["description"]
 
             room = Room()
             room.description = room_desc
             rooms.update({room_name: room})
-            counter_loaded = counter_loaded + 1
 
-            insert_query = f"INSERT INTO room (room_id, room_name, room_desc) VALUES ({room_id},{room_name},{room_desc})"
+            insert_query = f"INSERT INTO room (room_id, room_name, room_desc) VALUES ({room_id},\"{room_name}\",\"{room_desc}\")"
             cursor.execute(insert_query)
             connection.commit()
+
+            counter_room = counter_room + 1
+            counter_loaded = counter_loaded + 1
 
             # the first room is the starting location
             if (location == "start"):
