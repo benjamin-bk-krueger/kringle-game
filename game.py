@@ -596,7 +596,7 @@ def load_data():
         cursor.execute(select_query)
         junction_records = cursor.fetchall()
 
-        for i in person_records:
+        for i in junction_records:
             junction = Junction()
             junction.destination = i[0]
             junction.location = i[1]
