@@ -15,12 +15,10 @@ RUN apt-get clean
 RUN rm -rf /var/lib/apt/lists/*
 
 RUN useradd -m -s /home/game/game.sh -p $(mkpasswd --hash=SHA-512 game) game
-# RUN mkdir /home/game/images /home/game/quests
+RUN mkdir /home/game/.kringlecon
+RUN chown game /home/game/.kringlecon
 
 COPY *.sh *.py /home/game/
-# COPY *.json /home/game/
-# COPY images/* /home/game/images/
-# COPY quests/* /home/game/quests/
 
 RUN mkdir /run/sshd
 
