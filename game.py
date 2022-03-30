@@ -88,6 +88,137 @@ def refresh_data():
     with ZipFile(gamedata + "/gamedata.zip", 'r') as zip:
         zip.extractall(gamedata)
 
+    counter_room = 1
+    counter_item = 1
+    counter_character = 1
+    counter_objective = 1
+    counter_loaded = 0
+    f = open(gamedata + "/data.json")
+    data = json.load(f)
+
+    try:
+        # Connect to an existing database
+        connection = psycopg2.connect(user="postgres",
+                                    password="postgres",
+                                    host="kringle_database",
+                                    port="5432",
+                                    database="postgres")
+
+        # Create a cursor to perform database operations
+        cursor = connection.cursor()
+        # Executing a SQL query
+        cursor.execute("SELECT version();")
+        # Fetch result
+        record = cursor.fetchone()
+        print("You are connected to - ", record, "\n")
+
+        # purge the whole database
+        delete_query = "DELETE FROM junction;"
+        cursor.execute(delete_query)
+        connection.commit()
+        delete_query = "DELETE FROM person;"
+        cursor.execute(delete_query)
+        connection.commit()
+        delete_query = "DELETE FROM objective;"
+        cursor.execute(delete_query)
+        connection.commit()
+        delete_query = "DELETE FROM item;"
+        cursor.execute(delete_query)
+        connection.commit()
+        delete_query = "DELETE FROM room;"
+        cursor.execute(delete_query)
+        connection.commit()
+
+        # load all rooms
+        for i in data["rooms"]:
+            room_id = counter_room
+            room_name = i["name"]
+            room_desc = i["description"]
+
+            insert_query = "INSERT INTO room (room_id, room_name, room_desc) VALUES (%s, %s, %s);"
+            cursor.execute(insert_query, (room_id, room_name, room_desc))
+            connection.commit()
+
+            counter_room = counter_room + 1
+            counter_loaded = counter_loaded + 1
+            
+            # load all items in the room
+            try:
+                for j in i["items"]:
+                    item_id = counter_item
+                    item_name = j["name"]
+                    item_desc = j["description"]
+
+                    insert_query = "INSERT INTO item (item_id, room_id, item_name, item_desc) VALUES (%s, %s, %s, %s);"
+                    cursor.execute(insert_query, (item_id, room_id, item_name, item_desc))
+                    connection.commit()
+
+                    counter_item = counter_item + 1
+                    counter_loaded = counter_loaded + 1
+            except:
+                pass
+            
+            # load all characters in the room
+            try:
+                for j in i["characters"]:
+                    person_id = counter_character
+                    person_name = j["name"]
+                    person_desc = j["description"]
+
+                    insert_query = "INSERT INTO person (person_id, room_id, person_name, person_desc) VALUES (%s, %s, %s, %s);"
+                    cursor.execute(insert_query, (person_id, room_id, person_name, person_desc))
+                    connection.commit()
+
+                    counter_character = counter_character + 1
+                    counter_loaded = counter_loaded + 1
+            except:
+                pass
+
+            # load all objectives in the room
+            try:
+                for j in i["objectives"]:
+                    objective_id = counter_objective
+                    objective_name = j["name"]
+                    objective_desc = j["description"]
+                    difficulty = ["difficulty"]
+                    objective_url = j["url"]
+                    supported_by = 1
+                    requires = 1
+
+                    insert_query = "INSERT INTO objective (objective_id, room_id, objective_name, objective_desc, difficulty, objective_url, supported_by, requires) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"
+                    cursor.execute(insert_query, (objective_id, room_id, objective_name, objective_desc, difficulty, objective_url, supported_by, requires))
+                    connection.commit()
+
+                    counter_objective = counter_objective + 1
+                    counter_loaded = counter_loaded + 1
+            except:
+                pass
+
+            # load all junctions in the room
+            try:
+                for j in i["junctions"]:
+                    destination = 1
+                    junction_desc = j["description"]
+
+                    insert_query = "INSERT INTO junction (destination, room_id, junction_desc) VALUES (%s, %s, %s);"
+                    cursor.execute(insert_query, (destination, room_id, junction_desc))
+                    connection.commit()
+
+                    counter_loaded = counter_loaded + 1
+            except:
+                pass
+
+    except (Exception, Error) as error:
+        print("Error while connecting to PostgreSQL", error)
+    finally:
+        if (connection):
+            cursor.close()
+            connection.close()
+            print("PostgreSQL connection is closed")
+    
+    f.close()
+    return(counter_loaded)
+
 # have a detailed look what kind of objects a room contains - "inspect" command assigned
 def inspect():
     print(f"You are {bcolors.HEADER}inspecting the place{bcolors.ENDC} and looking for further objects you can interact with...")
@@ -436,9 +567,9 @@ def load_data():
             room.description = room_desc
             rooms.update({room_name: room})
 
-            insert_query = "INSERT INTO room (room_id, room_name, room_desc) VALUES (%s, %s, %s);"
-            cursor.execute(insert_query, (room_id, room_name, room_desc))
-            connection.commit()
+            #insert_query = "INSERT INTO room (room_id, room_name, room_desc) VALUES (%s, %s, %s);"
+            #cursor.execute(insert_query, (room_id, room_name, room_desc))
+            #connection.commit()
 
             counter_room = counter_room + 1
             counter_loaded = counter_loaded + 1
