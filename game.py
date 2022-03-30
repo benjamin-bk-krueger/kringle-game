@@ -35,7 +35,6 @@ console = Console()     # markdown output to console
 gamedata = os.environ['HOME'] + "/.kringlecon"  # directory for game data
 gameurl = 'https://white.blk8.de/kringle_gamedata/2021-kringlecon.zip' # url for game data
 
-
 # all the actions the player can perform
 # only triggered once automatically when the player arrives (starts the program) - no command assigned
 def arrive():

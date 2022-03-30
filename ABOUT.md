@@ -125,3 +125,9 @@ This way providing updated game data or another completely different scenario is
 
 Added some colors to the game by using ANSI codes.  
 All the game texts are much easier to read now.
+
+***2022-03-30***
+
+Today I did the first big update since a few days. Currently the whole game is quite static and doesn't allow any changes regarding the game files (except providing a new JSON config).  
+Instead of parsing the JSON config on each startup the game is now able to import the same JSON config into a PostgreSQL database (third and new docker-compose entity). The game is then reading the game data located in the DB. This way it should be much easier to do modifications at a later time. I experimented adding/modifying a JSON but it turned out JSON is only good when used read-only.  
+‚
