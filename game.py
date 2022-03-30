@@ -436,7 +436,7 @@ def load_data():
             rooms.update({room_name: room})
             counter_loaded = counter_loaded + 1
 
-            insert_query = f"INSERT INTO room (room_id, room_name, room_desc) VALUE ({room_id},{room_name},{room_desc})"
+            insert_query = f"INSERT INTO room (room_id, room_name, room_desc) VALUES ({room_id},{room_name},{room_desc})"
             cursor.execute(insert_query)
             connection.commit()
 
