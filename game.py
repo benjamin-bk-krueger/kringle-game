@@ -143,58 +143,62 @@ def refresh_data():
             counter_loaded = counter_loaded + 1
             
             # load all items in the room
-            for j in i["items"]:
-                item_id = counter_item
-                item_name = j["name"]
-                item_desc = j["description"]
+            if "items" in i:
+                for j in i["items"]:
+                    item_id = counter_item
+                    item_name = j["name"]
+                    item_desc = j["description"]
 
-                insert_query = "INSERT INTO item (item_id, room_id, item_name, item_desc) VALUES (%s, %s, %s, %s);"
-                cursor.execute(insert_query, (item_id, room_id, item_name, item_desc))
-                connection.commit()
+                    insert_query = "INSERT INTO item (item_id, room_id, item_name, item_desc) VALUES (%s, %s, %s, %s);"
+                    cursor.execute(insert_query, (item_id, room_id, item_name, item_desc))
+                    connection.commit()
 
-                counter_item = counter_item + 1
-                counter_loaded = counter_loaded + 1
-            
+                    counter_item = counter_item + 1
+                    counter_loaded = counter_loaded + 1
+                
             # load all characters in the room
-            for j in i["characters"]:
-                person_id = counter_character
-                person_name = j["name"]
-                person_desc = j["description"]
+            if "characters" in i:
+                for j in i["characters"]:
+                    person_id = counter_character
+                    person_name = j["name"]
+                    person_desc = j["description"]
 
-                insert_query = "INSERT INTO person (person_id, room_id, person_name, person_desc) VALUES (%s, %s, %s, %s);"
-                cursor.execute(insert_query, (person_id, room_id, person_name, person_desc))
-                connection.commit()
+                    insert_query = "INSERT INTO person (person_id, room_id, person_name, person_desc) VALUES (%s, %s, %s, %s);"
+                    cursor.execute(insert_query, (person_id, room_id, person_name, person_desc))
+                    connection.commit()
 
-                counter_character = counter_character + 1
-                counter_loaded = counter_loaded + 1
+                    counter_character = counter_character + 1
+                    counter_loaded = counter_loaded + 1
 
             # load all objectives in the room
-            for j in i["objectives"]:
-                objective_id = counter_objective
-                objective_name = j["name"]
-                objective_desc = j["description"]
-                difficulty = ["difficulty"]
-                objective_url = j["url"]
-                supported_by = 1
-                requires = 1
+            if "objectives" in i:
+                for j in i["objectives"]:
+                    objective_id = counter_objective
+                    objective_name = j["name"]
+                    objective_desc = j["description"]
+                    difficulty = ["difficulty"]
+                    objective_url = j["url"]
+                    supported_by = 1
+                    requires = 1
 
-                insert_query = "INSERT INTO objective (objective_id, room_id, objective_name, objective_desc, difficulty, objective_url, supported_by, requires) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"
-                cursor.execute(insert_query, (objective_id, room_id, objective_name, objective_desc, difficulty, objective_url, supported_by, requires))
-                connection.commit()
+                    insert_query = "INSERT INTO objective (objective_id, room_id, objective_name, objective_desc, difficulty, objective_url, supported_by, requires) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"
+                    cursor.execute(insert_query, (objective_id, room_id, objective_name, objective_desc, difficulty, objective_url, supported_by, requires))
+                    connection.commit()
 
-                counter_objective = counter_objective + 1
-                counter_loaded = counter_loaded + 1
+                    counter_objective = counter_objective + 1
+                    counter_loaded = counter_loaded + 1
 
             # load all junctions in the room
-            for j in i["junctions"]:
-                destination = 1
-                junction_desc = j["description"]
+            if "junctions" in i:
+                for j in i["junctions"]:
+                    destination = 1
+                    junction_desc = j["description"]
 
-                insert_query = "INSERT INTO junction (destination, room_id, junction_desc) VALUES (%s, %s, %s);"
-                cursor.execute(insert_query, (destination, room_id, junction_desc))
-                connection.commit()
+                    insert_query = "INSERT INTO junction (destination, room_id, junction_desc) VALUES (%s, %s, %s);"
+                    cursor.execute(insert_query, (destination, room_id, junction_desc))
+                    connection.commit()
 
-                counter_loaded = counter_loaded + 1
+                    counter_loaded = counter_loaded + 1
 
     except (Exception, Error) as error:
         print("Error while connecting to PostgreSQL", error)
