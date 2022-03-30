@@ -546,8 +546,6 @@ def load_data():
         room_records = cursor.fetchall()
 
         for i in room_records:
-            subcursor = connection.cursor()
-
             room = Room()
             room.description = i[2]
             rooms.update({i[1]: room})
@@ -556,40 +554,43 @@ def load_data():
             # the first room is the starting location
             if (location == "start"):
                 location = i[1]
+
+        select_query = "select * from item;"
+        cursor.execute(select_query)
+        item_records = cursor.fetchall()
+
+        for i in item_records:
+            item = Item()
+            item.description = i[3]
+            item.location = i[1]
+            items.update({i[2]: item})
+            counter_loaded = counter_loaded + 1
             
-            # load all items in the room
-            subselect_query = "select * from item where room_id = " + i[0] + ";"
-            subcursor.execute(subselect_query)
-            item_records = subcursor.fetchall()
+        select_query = "select * from person;"
+        cursor.execute(select_query)
+        person_records = cursor.fetchall()
 
-            for j in item_records:
-                item = Item()
-                item.description = j[3]
-                item.location = i[1]
-                items.update({j[2]: item})
-                counter_loaded = counter_loaded + 1
+        for i in person_records:
+            character = Character()
+            character.description = i[3]
+            character.location = i[1]
+            characters.update({i[2]: character})
+            counter_loaded = counter_loaded + 1
 
-            # load all characters in the room
-            #if "characters" in i:
-            #    for j in i["characters"]:
-            #        character = Character()
-            #        character.description = j["description"]
-            #        character.location = i["name"]
-            #        characters.update({j["name"]: character})
-            #        counter_loaded = counter_loaded + 1
+        select_query = "select * from objective;"
+        cursor.execute(select_query)
+        objective_records = cursor.fetchall()
 
-            # load all objectives in the room
-            #if "objectives" in i:
-            #    for j in i["objectives"]:
-            #        objective = Objective()
-            #        objective.description = j["description"]
-            #        objective.location = i["name"]
-            #        objective.difficulty = j["difficulty"]
-            #        objective.url = j["url"]
-            #        objective.supportedby = j["supportedby"]
-            #        objective.requires = j["requires"]
-            #        objectives.update({j["name"]: objective})
-            #        counter_loaded = counter_loaded + 1
+        for i in objective_records:
+            objective = Objective()
+            objective.description = i[3]
+            objective.location = i[1]
+            objective.difficulty = i[4]
+            objective.url = i[5]
+            objective.supportedby = i[6]
+            objective.requires = i[7]
+            objectives.update({i[2]: objective})
+            counter_loaded = counter_loaded + 1
 
             # load all junctions in the room
             #if "junctions" in i:
