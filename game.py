@@ -149,8 +149,8 @@ def refresh_data():
                     item_name = j["name"]
                     item_desc = j["description"]
 
-                    insert_query = "INSERT INTO item (item_id, room_id, item_name, item_desc) VALUES (%s, %s, %s, %s);"
-                    cursor.execute(insert_query, (item_id, room_id, item_name, item_desc))
+                    insert_query = "INSERT INTO item (item_id, room_name, item_name, item_desc) VALUES (%s, %s, %s, %s);"
+                    cursor.execute(insert_query, (item_id, room_name, item_name, item_desc))
                     connection.commit()
 
                     counter_item = counter_item + 1
@@ -163,8 +163,8 @@ def refresh_data():
                     person_name = j["name"]
                     person_desc = j["description"]
 
-                    insert_query = "INSERT INTO person (person_id, room_id, person_name, person_desc) VALUES (%s, %s, %s, %s);"
-                    cursor.execute(insert_query, (person_id, room_id, person_name, person_desc))
+                    insert_query = "INSERT INTO person (person_id, room_name, person_name, person_desc) VALUES (%s, %s, %s, %s);"
+                    cursor.execute(insert_query, (person_id, room_name, person_name, person_desc))
                     connection.commit()
 
                     counter_character = counter_character + 1
@@ -181,8 +181,8 @@ def refresh_data():
                     supported_by = j["supportedby"]
                     requires = j["requires"]
 
-                    insert_query = "INSERT INTO objective (objective_id, room_id, objective_name, objective_desc, difficulty, objective_url, supported_by, requires) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"
-                    cursor.execute(insert_query, (objective_id, room_id, objective_name, objective_desc, difficulty, objective_url, supported_by, requires))
+                    insert_query = "INSERT INTO objective (objective_id, room_name, objective_name, objective_desc, difficulty, objective_url, supported_by, requires) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"
+                    cursor.execute(insert_query, (objective_id, room_name, objective_name, objective_desc, difficulty, objective_url, supported_by, requires))
                     connection.commit()
 
                     counter_objective = counter_objective + 1
@@ -194,8 +194,8 @@ def refresh_data():
                     destination = j["destination"]
                     junction_desc = j["description"]
 
-                    insert_query = "INSERT INTO junction (destination, room_id, junction_desc) VALUES (%s, %s, %s);"
-                    cursor.execute(insert_query, (destination, room_id, junction_desc))
+                    insert_query = "INSERT INTO junction (destination, room_name, junction_desc) VALUES (%s, %s, %s);"
+                    cursor.execute(insert_query, (destination, room_name, junction_desc))
                     connection.commit()
 
                     counter_loaded = counter_loaded + 1
