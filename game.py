@@ -521,18 +521,9 @@ def display_markdown(md_name):
 
 # parses the JSON based configuration file and creature objects from that configuration, requires json
 def load_data():
-    if (not os.path.exists(gamedata)):
-        os.mkdir(gamedata) 
-        urllib.request.urlretrieve(gameurl, gamedata + "/gamedata.zip")
-        with ZipFile(gamedata + "/gamedata.zip", 'r') as zip:
-            zip.extractall(gamedata)
-
     global location
     counter = 1
-    counter_room = 1
     counter_loaded = 0
-    f = open(gamedata + "/data.json")
-    data = json.load(f)
 
     try:
         # Connect to an existing database
@@ -550,67 +541,20 @@ def load_data():
         record = cursor.fetchone()
         print("You are connected to - ", record, "\n")
 
-        for i in data["rooms"]:
-            room_id = counter_room
-            room_name = i["name"]
-            room_desc = i["description"]
+        select_query = "select * from room"
+        room_records = cursor.fetchall()
 
+        for i in room_records:
             room = Room()
-            room.description = room_desc
-            rooms.update({room_name: room})
-
-            #insert_query = "INSERT INTO room (room_id, room_name, room_desc) VALUES (%s, %s, %s);"
-            #cursor.execute(insert_query, (room_id, room_name, room_desc))
-            #connection.commit()
-
-            counter_room = counter_room + 1
+            room.description = i[2]
+            rooms.update({i[1]: room})
             counter_loaded = counter_loaded + 1
 
             # the first room is the starting location
             if (location == "start"):
-                location = i["name"]
+                location = i[1]
             
-            # load all items in the room
-            if "items" in i:
-                for j in i["items"]:
-                    item = Item()
-                    item.description = j["description"]
-                    item.location = i["name"]
-                    items.update({j["name"]: item})
-                    counter_loaded = counter_loaded + 1
-
-            # load all characters in the room
-            if "characters" in i:
-                for j in i["characters"]:
-                    character = Character()
-                    character.description = j["description"]
-                    character.location = i["name"]
-                    characters.update({j["name"]: character})
-                    counter_loaded = counter_loaded + 1
-
-            # load all objectives in the room
-            if "objectives" in i:
-                for j in i["objectives"]:
-                    objective = Objective()
-                    objective.description = j["description"]
-                    objective.location = i["name"]
-                    objective.difficulty = j["difficulty"]
-                    objective.url = j["url"]
-                    objective.supportedby = j["supportedby"]
-                    objective.requires = j["requires"]
-                    objectives.update({j["name"]: objective})
-                    counter_loaded = counter_loaded + 1
-
-            # load all junctions in the room
-            if "junctions" in i:
-                for j in i["junctions"]:
-                    junction = Junction()
-                    junction.destination = j["destination"]
-                    junction.description = j["description"]
-                    junction.location = i["name"]
-                    junctions.update({counter: junction})
-                    counter = counter + 1
-                    counter_loaded = counter_loaded + 1
+            
 
     except (Exception, Error) as error:
         print("Error while connecting to PostgreSQL", error)
@@ -620,7 +564,6 @@ def load_data():
             connection.close()
             print("PostgreSQL connection is closed")
     
-    f.close()
     return(counter_loaded)
 
 # queries the user to enter a command and triggers the matching function
