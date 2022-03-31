@@ -1,2 +1,2 @@
 #!/bin/sh
-docker build -t benjaminkrueger/2022-kringlecon -f Dockerfile .
+docker build -t benjaminkrueger/kringle-game -f Dockerfile .
