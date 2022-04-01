@@ -7,6 +7,13 @@ services:
     command: /usr/sbin/sshd -D
     container_name: kringle_game
 
+  web:
+    image : benjaminkrueger/kringle-web
+    command: /root/flask.sh
+    ports:
+      - 5010:5010
+    container_name: kringle_web
+
   webssh:
     image : benjaminkrueger/wetty
     command: wetty -p 3000 --ssh-host game
