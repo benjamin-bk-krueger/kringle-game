@@ -130,3 +130,12 @@ All the game texts are much easier to read now.
 
 Today I did the first big update since a few days. Currently the whole game is quite static and doesn't allow any changes regarding the game files (except providing a new JSON config).  
 Instead of parsing the JSON config on each startup the game is now able to import the same JSON config into a PostgreSQL database (third and new docker-compose entity). The game is then reading the game data located in the DB. This way it should be much easier to do modifications at a later time. I experimented adding/modifying a JSON but it turned out JSON is only good when used read-only.  
+
+***2022-04-03***
+
+Today I have added a forth container: Flask Python. Flask is a Python framework which allows to develop web applications quite easily. Using Flask I have created some web pages which can display the content of the game's PostgreSQL database using simple HTML and CSS. My next step is to implement some REST API both allowing downloading and uploading game data.  
+Time for some recap...  
+My project has started about 50 days ago, sadly I could only afford to invest a few hours per week.  
+My project currently consists of 4 containers: A PostgreSQL database storing the game data, the game backend itself written in Python, a web frontend to display the DB contents and a WeTTY SSH terminal to access the game backend.  
+I have learned something about Python, Github (including Actions), Markdown, JSON, Docker (including docker-compose), PostgreSQL and a little bit about HTML, CSS and Kubernetes.  
+Things on my todo list: a REST API to modify game data, a markdown export, better error handling and Kubernetes once again (failed already once to get it up and running).
