@@ -12,6 +12,8 @@ RUN pip3 install rich
 RUN apt-get clean
 RUN rm -rf /var/lib/apt/lists/*
 
+RUN mkdir /run/sshd
+
 RUN useradd -m -s /home/game/game.sh -p $(mkpasswd --hash=SHA-512 game) game
 
 USER game
@@ -19,7 +21,5 @@ USER game
 RUN mkdir /home/game/.kringlecon
 
 COPY *.sh *.py /home/game/
-
-RUN mkdir /run/sshd
 
 CMD ["/usr/sbin/sshd","-D"]
