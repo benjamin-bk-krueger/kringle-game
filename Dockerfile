@@ -22,4 +22,6 @@ RUN mkdir /home/game/.kringlecon
 
 COPY *.sh *.py /home/game/
 
+USER root
+
 CMD ["/usr/sbin/sshd","-D"]
