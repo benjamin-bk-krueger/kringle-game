@@ -19,7 +19,7 @@ from character import Character
 from colors import bcolors
 
 cont = 1                # the program will run until this value is set to 0
-location = "start"      # the starting room, changes later in the game by walking around
+location = 0            # the starting room, changes later in the game by walking around
 
 rooms = dict()          # contains all available rooms
 objectives = dict()     # contains all available objectives
@@ -70,11 +70,11 @@ def help():
 def cheat():
     print(f"Suddenly you hear a {bcolors.HEADER}rolling thunder{bcolors.ENDC} all around you. You quickly close your eyes and open them again after a few seconds.")
     print(f"{bcolors.GREENFG}Has anything happened{bcolors.ENDC}? No? How strange you think and decide to carry on.")
-    for name, room in rooms.items():
+    for id, room in rooms.items():
         room.visited = True
-    for name, objective in objectives.items():
+    for id, objective in objectives.items():
         objective.visited = True
-    for name, item in items.items():
+    for id, item in items.items():
         item.visited = True
 
 # fetch the configuration again from the default URL - HIDDEN "urlrefresh" command assigned
@@ -92,31 +92,31 @@ def inspect():
     print(f"You are {bcolors.HEADER}inspecting the place{bcolors.ENDC} and looking for further objects you can interact with...")
     print("")
 
-    for name, objective in objectives.items():
+    for id, objective in objectives.items():
         if (objective.location == location):
-            print(f"In this room you can see {bcolors.BLUEFG}{name}{bcolors.ENDC} {objective.description}.")
+            print(f"In this room you can see {bcolors.BLUEFG}{objective.name}{bcolors.ENDC} {objective.description}.")
             if (objective.supportedby != "none"):
                 print(f"|- {objective.supportedby} can you give some hints for this quest.")
             if (objective.visited):
-                print(f"`- You {bcolors.GREENFG}already have talked{bcolors.ENDC} to {name} before.")
+                print(f"`- You {bcolors.GREENFG}already have talked{bcolors.ENDC} to {objective.name} before.")
             else:
-                print(f"`- You have {bcolors.REDFG}not talked{bcolors.ENDC} to {name} yet.")
+                print(f"`- You have {bcolors.REDFG}not talked{bcolors.ENDC} to {objective.name} yet.")
             print("")
 
-    for name, item in items.items():
+    for id, item in items.items():
         if (item.location == location):
             if (not item.visited):
-                print(f"In a corner you can see a {bcolors.BLUEFG}{name}{bcolors.ENDC} lying around. You guess it's a {item.description}.")
+                print(f"In a corner you can see a {bcolors.BLUEFG}{item.name}{bcolors.ENDC} lying around. You guess it's a {item.description}.")
                 print("")
 
-    for name, character in characters.items():
+    for id, character in characters.items():
         if (character.location == location):
-            print(f"Furthermore you can see {bcolors.BLUEFG}{name}{bcolors.ENDC} {character.description}")
+            print(f"Furthermore you can see {bcolors.BLUEFG}{character.name}{bcolors.ENDC} {character.description}")
             print("")
 
-    for name, junction in junctions.items():
+    for id, junction in junctions.items():
         if (junction.location == location):
-            print(f"{junction.description} you can see a junction to {bcolors.BLUEFG}{junction.destination}{bcolors.ENDC}.")
+            print(f"{junction.description} you can see a junction to {bcolors.BLUEFG}{rooms[junction.destination].name}{bcolors.ENDC}.")
             if (rooms[junction.destination].visited):
                 print (f"`- You {bcolors.GREENFG}have visited{bcolors.ENDC} that location already.")
             else:
@@ -129,37 +129,34 @@ def meditate():
 
 # have a quick look at this place - "look" command assigned
 def look():
-    print(f"You are currently at {bcolors.BLUEFG}{location}{bcolors.ENDC} and {bcolors.HEADER}admiring{bcolors.ENDC} what your eyes can see...")
+    print(f"You are currently at {bcolors.BLUEFG}{rooms[location].name}{bcolors.ENDC} and {bcolors.HEADER}admiring{bcolors.ENDC} what your eyes can see...")
     print("")
-    display_image(location)
-    print("")
+    display_image(rooms[location].name)
     print(rooms[location].description)
 
 # phone other creatures you already have discovered - "phone" command assigned
 def phone():
-    # necessary for creature name auto-completion
-    global volcab
-    new_volcab = []
-
     print(f"You put your hand into your right pocket and {bcolors.HEADER}grab a magical device{bcolors.ENDC}.")
     print("It has a display where you can see the names of all the creatures you had contact with.")
     print(f"You guess you can {bcolors.GREENFG}open some channel{bcolors.ENDC} to a creature by tapping its name.")
 
     # assign all visited creatures to the auto-completion list
     counter = 0
-    for name, objective in objectives.items():
+    for id, objective in objectives.items():
         if (objective.visited):
             counter = counter + 1
-            new_volcab.append(name)
             print(f"|- {name}")
 
     if (counter > 0):
-        set_custom_complete(new_volcab)
         print("")
-        name = input(f"{bcolors.GREYBG}I want to talk to ---->{bcolors.ENDC} ")
+        namefull = input(f"{bcolors.GREYBG}I want to talk to ---->{bcolors.ENDC} ")
+        try:
+            name = int(namefull)
+        except:
+            name = 0
         if (name in objectives):
             objectives[name].visited = True
-            talk_to(name, objectives[name].url)
+            talk_to(name)
         else:
             print("")
             print(f"You decide you {bcolors.REDFG}don't want to talk{bcolors.ENDC} right now.")
@@ -170,27 +167,25 @@ def phone():
     
 # talk to other creatures - "talk" command assigned
 def talk():
-    # necessary for creature name auto-completion
-    global volcab
-    new_volcab = []
-
     print(f"You {bcolors.HEADER}look around{bcolors.ENDC} for other characters in this room.")
 
     # assign all creatures in this room to the auto-completion list
     counter = 0
-    for name, objective in objectives.items():
+    for id, objective in objectives.items():
         if (objective.location == location):
             counter = counter + 1
-            new_volcab.append(name)
-            print(f"|- {name}")
+            print(f"|- [{id}] {objective.name}")
 
     if (counter > 0):
-        set_custom_complete(new_volcab)
         print("")
-        name = input(f"{bcolors.GREYBG}I want to talk to ---->{bcolors.ENDC} ")
+        namefull = input(f"{bcolors.GREYBG}I want to talk to ---->{bcolors.ENDC} ")
+        try:
+            name = int(namefull)
+        except:
+            name = 0
         if (name in objectives):
             objectives[name].visited = True
-            talk_to(name, objectives[name].url)
+            talk_to(name)
         else:
             print("")
             print(f"You decide you {bcolors.REDFG}don't want to talk{bcolors.ENDC} right now.")
@@ -202,9 +197,7 @@ def talk():
 # beam to places you already have discovered - "beam" command assigned
 def beam():
     # necessary for room name auto-completion and new room selection
-    global volcab
     global location
-    new_volcab = []
 
     print(f"You put your hand into your left pocket and {bcolors.HEADER}grab a magical device{bcolors.ENDC}.")
     print("It has a display where you can see the names of all the places you have visited.")
@@ -212,19 +205,21 @@ def beam():
 
     # assign all visited rooms to the auto-completion list
     counter = 0
-    for name, room in rooms.items():
+    for id, room in rooms.items():
         if (room.visited):
             counter = counter + 1
-            new_volcab.append(name)
-            print(f"|- {name}")
+            print(f"|- [{id}] {room.name}")
 
     if (counter > 0):
-        set_custom_complete(new_volcab)
         print("")
-        destination = input(f"{bcolors.GREYBG}I want to go to ------>{bcolors.ENDC} ")
+        dest = input(f"{bcolors.GREYBG}I want to go to ------>{bcolors.ENDC} ")
+        try:
+            destination = int(dest)
+        except:
+            destination = 0
         if (location != destination and destination in rooms):
             print("")
-            print(f"You are {bcolors.GREENFG}going to{bcolors.ENDC} {destination}")
+            print(f"You are {bcolors.GREENFG}going to{bcolors.ENDC} {rooms[destination].name}")
             location = destination
         else:
             print("")
@@ -237,9 +232,7 @@ def beam():
 # walk to other places - "walk" command assigned
 def walk():
     # necessary for room name auto-completion and new room selection
-    global volcab
     global location
-    new_volcab = []
 
     print(f"You {bcolors.HEADER}look around{bcolors.ENDC} for other places to reach.")
 
@@ -248,16 +241,18 @@ def walk():
     for id, junction in junctions.items():
         if (junction.location == location):
             counter = counter + 1
-            new_volcab.append(junction.destination)
-            print(f"|- {junction.destination}")
+            print(f"|- [{junction.destination}] {rooms[junction.destination].name}")
 
     if (counter > 0):
-        set_custom_complete(new_volcab)
         print ("")
-        destination = input(f"{bcolors.GREYBG}I want to go to ------>{bcolors.ENDC} ")
+        dest = input(f"{bcolors.GREYBG}I want to go to ------>{bcolors.ENDC} ")
+        try:
+            destination = int(dest)
+        except:
+            destination = 0
         if (location != destination and destination in rooms):
             print("")
-            print(f"You are {bcolors.GREENFG}going to{bcolors.ENDC} {destination}")
+            print(f"You are {bcolors.GREENFG}going to{bcolors.ENDC} {rooms[destination].name}")
             location = destination
             rooms[destination].visited = True
         else:
@@ -269,28 +264,26 @@ def walk():
 
 # grab an item - "grab" command assigned
 def grab():
-    # necessary for item name auto-completion
-    global volcab
-    new_volcab = []
-
     print(f"You {bcolors.HEADER}look around{bcolors.ENDC} for things to grab.")
 
     # assign all items in this room to the auto-completion list
     counter = 0
-    for name, item in items.items():
+    for id, item in items.items():
         if (item.location == location and item.visited is not True):
             counter = counter + 1
-            new_volcab.append(name)
-            print(f"|- {name}")
+            print(f"|- [{id}] {item.name}")
 
     if (counter > 0):
-        set_custom_complete(new_volcab)
         print("")
-        name = input(f"{bcolors.GREYBG}I want to grab ------->{bcolors.ENDC} ")
-        if (name in items):
-            items[name].visited = True
+        idname = input(f"{bcolors.GREYBG}I want to grab ------->{bcolors.ENDC} ")
+        try:
+            id = int(idname)
+        except:
+            id = 0
+        if (id in items):
+            items[id].visited = True
             print("")
-            print(f"You grab the {name} and {bcolors.GREENFG}put it into your bag{bcolors.ENDC}.")
+            print(f"You grab the {items[id].name} and {bcolors.GREENFG}put it into your bag{bcolors.ENDC}.")
         else:
             print("")
             print(f"You decide you {bcolors.REDFG}don't want to grab{bcolors.ENDC} anything right now.")
@@ -304,13 +297,13 @@ def recap():
     counter_r = 0
     counter_o = 0
     counter_i = 0
-    for name, room in rooms.items():
+    for id, room in rooms.items():
         if (room.visited):
             counter_r = counter_r + 1
-    for name, objective in objectives.items():
+    for id, objective in objectives.items():
         if (objective.visited):
             counter_o = counter_o + 1
-    for name, item in items.items():
+    for id, item in items.items():
         if (item.visited):
             counter_i = counter_i + 1
     print(f"You {bcolors.HEADER}have visited{bcolors.ENDC} {str(counter_r)} room(s). You feel like there is/are {str(len(rooms) - counter_r)} more to discover.")
@@ -337,10 +330,10 @@ def yesno():
         return False
 
 # talk to a character
-def talk_to(name, url):
+def talk_to(name):
     print("")
-    print(f"You are talking to {bcolors.BLUEFG}{name}{bcolors.ENDC}")
-    display_image(name)
+    print(f"You are talking to {bcolors.BLUEFG}{objectives[name].name}{bcolors.ENDC}")
+    display_image(objectives[name].name)
 
     if (objectives[name].requires != "none" and not items[objectives[name].requires].visited):
         print("")
@@ -395,100 +388,114 @@ def display_markdown(md_name):
         print(f"Markdown file not found for {md_name}")
         return (False)
 
-# parses the JSON based configuration file and creature objects from that configuration, requires json
-def load_data():
-    global location
-    counter = 1
-    counter_loaded = 0
 
+# open a connection to PostgreSQL DB and return the connection
+def get_db_connection():
     try:
-        # Connect to an existing database
-        connection = psycopg2.connect(user="postgres",
+        conn = psycopg2.connect(user="postgres",
                                     password="postgres",
                                     host="kringle_database",
                                     port="5432",
                                     database="postgres")
-
-        # Create a cursor to perform database operations
-        cursor = connection.cursor()
-        # Executing a SQL query
-        cursor.execute("SELECT version();")
-        # Fetch result
-        record = cursor.fetchone()
-        print("You are connected to - ", record, "\n")
-
-        select_query = "select * from room;"
-        cursor.execute(select_query)
-        room_records = cursor.fetchall()
-
-        for i in room_records:
-            room = Room()
-            room.description = i[2]
-            rooms.update({i[1]: room})
-            counter_loaded = counter_loaded + 1
-
-            # the first room is the starting location
-            if (location == "start"):
-                location = i[1]
-
-        select_query = "select * from item;"
-        cursor.execute(select_query)
-        item_records = cursor.fetchall()
-
-        for i in item_records:
-            item = Item()
-            item.description = i[3]
-            item.location = i[1]
-            items.update({i[2]: item})
-            counter_loaded = counter_loaded + 1
-            
-        select_query = "select * from person;"
-        cursor.execute(select_query)
-        person_records = cursor.fetchall()
-
-        for i in person_records:
-            character = Character()
-            character.description = i[3]
-            character.location = i[1]
-            characters.update({i[2]: character})
-            counter_loaded = counter_loaded + 1
-
-        select_query = "select * from objective;"
-        cursor.execute(select_query)
-        objective_records = cursor.fetchall()
-
-        for i in objective_records:
-            objective = Objective()
-            objective.description = i[3]
-            objective.location = i[1]
-            objective.difficulty = i[4]
-            objective.url = i[5]
-            objective.supportedby = i[6]
-            objective.requires = i[7]
-            objectives.update({i[2]: objective})
-            counter_loaded = counter_loaded + 1
-
-        select_query = "select * from junction;"
-        cursor.execute(select_query)
-        junction_records = cursor.fetchall()
-
-        for i in junction_records:
-            junction = Junction()
-            junction.destination = i[0]
-            junction.location = i[1]
-            junction.description = i[2]
-            junctions.update({counter: junction})
-            counter = counter + 1
-            counter_loaded = counter_loaded + 1
-
+        return conn
     except (Exception, Error) as error:
-        print("Error while connecting to PostgreSQL", error)
-    finally:
-        if (connection):
-            cursor.close()
-            connection.close()
-            print("PostgreSQL connection is closed")
-    
+        return None
+
+# fetch all rows from a query
+def fetch_all_from_db(query):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute(query)
+    results = cur.fetchall()
+    cur.close()
+    conn.close()
+    return results
+
+# fetch only a single row from a query
+def fetch_one_from_db(query):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute(query)
+    result = cur.fetchone()
+    cur.close()
+    conn.close()
+    return result
+
+# update one row from a query
+def update_one_in_db(query):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute(query)
+    cur.close()
+    conn.commit()
+    conn.close()
+
+# parses the JSON based configuration file and creature objects from that configuration, requires json
+def load_data():
+    creator_name = 'Ben Krueger'
+    world_name = 'KringleCon2021'
+
+    global location
+    counter_loaded = 0
+
+    record = fetch_one_from_db("SELECT version();")
+    print("You are connected to - ", record, "\n")
+
+    world = fetch_one_from_db(f'SELECT * FROM world WHERE world_name = \'{world_name}\';')
+    world_id = world[0]
+
+    room_records = fetch_all_from_db(f"SELECT * FROM room WHERE world_id = {world_id};")
+    for i in room_records:
+        room = Room()
+        room.name = i[2]
+        room.description = i[3]
+        rooms.update({i[0]: room})
+        counter_loaded = counter_loaded + 1
+
+        # the first room is the starting location
+        if (location == 0):
+            location = i[0]
+
+    item_records = fetch_all_from_db(f"select * from item WHERE world_id = {world_id};")
+    for i in item_records:
+        item = Item()
+        item.name = i[3]
+        item.description = i[4]
+        item.location = i[1]
+        items.update({i[0]: item})
+        counter_loaded = counter_loaded + 1
+        
+    person_records = fetch_all_from_db(f"select * from person WHERE world_id = {world_id};")
+    for i in person_records:
+        character = Character()
+        character.name = i[3]
+        character.description = i[4]
+        character.location = i[1]
+        characters.update({i[0]: character})
+        counter_loaded = counter_loaded + 1
+
+    objective_records = fetch_all_from_db(f"select * from objective WHERE world_id = {world_id};")
+    for i in objective_records:
+        objective = Objective()
+        objective.name = i[3]
+        objective.description = i[4]
+        objective.location = i[1]
+        objective.difficulty = i[5]
+        objective.url = i[6]
+        objective.supportedby = i[7]
+        objective.requires = i[8]
+        objectives.update({i[0]: objective})
+        counter_loaded = counter_loaded + 1
+
+    junction_records = fetch_all_from_db(f"select * from junction WHERE world_id = {world_id};")
+    for i in junction_records:
+        junction = Junction()
+        junction.destination = i[3]
+        junction.location = i[1]    
+        junction.description = i[4]
+        junctions.update({i[0]: junction})
+        counter_loaded = counter_loaded + 1
+
     return(counter_loaded)
 
 # queries the user to enter a command and triggers the matching function
