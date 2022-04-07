@@ -337,28 +337,28 @@ def talk_to(name):
 
     if (objectives[name].requires != "none" and not items[objectives[name].requires].visited):
         print("")
-        print(f"{bcolors.BLUEFG}{name}{bcolors.ENDC} asks for a {bcolors.BLUEFG}{objectives[name].requires}{bcolors.ENDC}. Sadly you can't find it in your bag.")
+        print(f"{bcolors.BLUEFG}{objectives[name].name}{bcolors.ENDC} asks for a {bcolors.BLUEFG}{objectives[name].requires}{bcolors.ENDC}. Sadly you can't find it in your bag.")
     else:
         print("")
-        print(f"{bcolors.BLUEFG}{name}{bcolors.ENDC} gives you following quest:")
+        print(f"{bcolors.BLUEFG}{objectives[name].name}{bcolors.ENDC} gives you following quest:")
         print("")
-        display_markdown(name + "_q")
+        display_markdown(objectives[name].name + "_q")
                         
         print("")
-        print(f"{bcolors.BLUEFG}{name}{bcolors.ENDC} asks you if you want to open this quest.")
+        print(f"{bcolors.BLUEFG}{objectives[name].name}{bcolors.ENDC} asks you if you want to open this quest.")
         print("")
         if (yesno()):
             # webbrowser.open(url, new=1)
             print("")
-            print(url)
+            print(objectives[name].url)
 
         print("")
-        print(f"After a short while {bcolors.BLUEFG}{name}{bcolors.ENDC} also offers you the solution.")
+        print(f"After a short while {bcolors.BLUEFG}{objectives[name].name}{bcolors.ENDC} also offers you the solution.")
         print("Do you want to hear it?")
         print("")
         if (yesno()):
             print("")
-            display_markdown(name + "_a")
+            display_markdown(objectives[name].name + "_a")
 
 # auto-completion with Python readline, requires readline
 def complete(text,state):

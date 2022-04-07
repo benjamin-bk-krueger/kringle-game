@@ -19,7 +19,7 @@ CREATE TABLE room (
 );
 
 CREATE UNIQUE INDEX idx_room_name
-ON room ( room_id, world_id );
+ON room ( room_name, world_id );
 
 CREATE TABLE item (
     item_id SERIAL PRIMARY KEY,
@@ -30,7 +30,7 @@ CREATE TABLE item (
 );
 
 CREATE UNIQUE INDEX idx_item_name
-ON item ( item_id, world_id );
+ON item ( item_name, world_id );
 
 CREATE TABLE objective (
     objective_id SERIAL PRIMARY KEY,
@@ -45,18 +45,18 @@ CREATE TABLE objective (
 );
 
 CREATE UNIQUE INDEX idx_objective_name
-ON objective ( objective_id, world_id );
+ON objective ( objective_name, world_id );
 
 CREATE TABLE person (
     person_id SERIAL PRIMARY KEY,
     room_id INT REFERENCES room ( room_id ),
     world_id INT REFERENCES world ( world_id),
-    person_name VARCHAR ( 100 ) UNIQUE NOT NULL,
+    person_name VARCHAR ( 100 ),
     person_desc VARCHAR ( 1024 )
 );
 
 CREATE UNIQUE INDEX idx_person_name
-ON person ( person_id, room_id );
+ON person ( person_name, room_id );
 
 CREATE TABLE junction (
     junction_id SERIAL PRIMARY KEY,
