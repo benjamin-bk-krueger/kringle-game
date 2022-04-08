@@ -368,9 +368,9 @@ def complete(text,state):
 # displays a colored ANSII image, depending on the terminal size, requires external program
 def display_image(image_name):
     try:
-        f = open(gamedata + "/images/" + image_name + ".jpg","r")
-        os.system("/bin/jp2a " + gamedata + "/images/" + image_name + ".jpg --colors --fill --color-depth=8")
-        f.close()
+        #f = open(gamedata + "/images/" + image_name + ".jpg","r")
+        os.system("/bin/jp2a \"" + gamedata + "/images/" + image_name + ".jpg\" --colors --fill --color-depth=8")
+        #f.close()
         return (True)
     except IOError:
         print(f"Image file not found for {image_name}")
