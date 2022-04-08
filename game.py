@@ -35,6 +35,9 @@ console = Console()     # markdown output to console
 gamedata = os.environ['HOME'] + "/.kringlecon"  # directory for game data
 gameurl = 'https://white.blk8.de/kringle_gamedata/2021-kringlecon.zip' # url for game data
 
+creator_name = 'Ben Krueger'
+world_name = 'KringleCon2021'
+
 # all the actions the player can perform
 # only triggered once automatically when the player arrives (starts the program) - no command assigned
 def arrive():
@@ -342,7 +345,7 @@ def talk_to(name):
         print("")
         print(f"{bcolors.BLUEFG}{objectives[name].name}{bcolors.ENDC} gives you following quest:")
         print("")
-        display_markdown(objectives[name].name + "_q")
+        display_quest(name)
                         
         print("")
         print(f"{bcolors.BLUEFG}{objectives[name].name}{bcolors.ENDC} asks you if you want to open this quest.")
@@ -358,7 +361,7 @@ def talk_to(name):
         print("")
         if (yesno()):
             print("")
-            display_markdown(objectives[name].name + "_a")
+            display_solution(name)
 
 # auto-completion with Python readline, requires readline
 def complete(text,state):
@@ -376,18 +379,29 @@ def display_image(image_name):
         print(f"Image file not found for {image_name}")
         return (False)
 
-# displays a markdown page
-def display_markdown(md_name):
-    try:
-        f = open(gamedata + "/quests/" + md_name + ".md","r")
-        md = Markdown(f.read())
-        console.print(md)
-        f.close()
-        return (True)
-    except IOError:
-        print(f"Markdown file not found for {md_name}")
-        return (False)
+# displays a quest markdown page
+def display_quest(md_name):
+    creator = fetch_one_from_db(f'SELECT * FROM creator where creator_name = \'{creator_name}\';')
+    creator_id = creator[0]
 
+    quest = fetch_one_from_db(f'SELECT * FROM quest where objective_id = {md_name} and creator_id = {creator_id};')
+    if (quest!= None):
+        md = Markdown(str(bytes(quest[3]), 'utf-8'))
+        console.print(md)
+    else:
+        console.print ("No quest entry found.")
+
+# displays a solution markdown page
+def display_solution(md_name):
+    creator = fetch_one_from_db(f'SELECT * FROM creator where creator_name = \'{creator_name}\';')
+    creator_id = creator[0]
+
+    quest = fetch_one_from_db(f'SELECT * FROM solution where objective_id = {md_name} and creator_id = {creator_id};')
+    if (quest!= None):
+        md = Markdown(str(bytes(quest[3]), 'utf-8'))
+        console.print(md)
+    else:
+        console.print ("No solution entry found.")
 
 # open a connection to PostgreSQL DB and return the connection
 def get_db_connection():
@@ -432,9 +446,6 @@ def update_one_in_db(query):
 
 # parses the JSON based configuration file and creature objects from that configuration, requires json
 def load_data():
-    creator_name = 'Ben Krueger'
-    world_name = 'KringleCon2021'
-
     global location
     counter_loaded = 0
 

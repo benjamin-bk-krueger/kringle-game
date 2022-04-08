@@ -73,7 +73,7 @@ CREATE TABLE quest (
     quest_id SERIAL PRIMARY KEY,
     objective_id INT REFERENCES objective ( objective_id ),
     creator_id INT REFERENCES creator ( creator_id ),
-    quest_text TEXT
+    quest_text BYTEA
 );
 
 CREATE UNIQUE INDEX idx_quest_creator
@@ -83,7 +83,7 @@ CREATE TABLE solution (
     solution_id SERIAL PRIMARY KEY,
     objective_id INT REFERENCES objective ( objective_id ),
     creator_id INT REFERENCES creator ( creator_id ),
-    solution_text TEXT
+    solution_text BYTEA
 );
 
 CREATE UNIQUE INDEX idx_solution_creator
