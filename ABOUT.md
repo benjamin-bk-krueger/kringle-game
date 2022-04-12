@@ -139,3 +139,9 @@ My project has started about 50 days ago, sadly I could only afford to invest a 
 My project currently consists of 4 containers: A PostgreSQL database storing the game data, the game backend itself written in Python, a web frontend to display the DB contents and a WeTTY SSH terminal to access the game backend.  
 I have learned something about Python, Github (including Actions), Markdown, JSON, Docker (including docker-compose), PostgreSQL and a little bit about HTML, CSS and Kubernetes.  
 Things on my todo list: a REST API to modify game data, a markdown export, better error handling and Kubernetes once again (failed already once to get it up and running).
+
+***2022-04-12***
+
+Lot of DB rework, linking each table using varchar name fields wasn't quite useful. I have introduced serial IDs, DB queries are a lot easier and reliable now. Sadly I had to adapt a lot of Python code.  
+My today's lessons learned: Have a good design before starting to code ;)  
+I have introduced new tables and Flask views for quests and solutions. This way I can edit and "upload" solutions using the web frontend which is much more user friendly. 
