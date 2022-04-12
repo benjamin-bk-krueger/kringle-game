@@ -1,6 +1,8 @@
 CREATE TABLE creator (
     creator_id SERIAL PRIMARY KEY,
-    creator_name VARCHAR ( 100 ) UNIQUE NOT NULL
+    creator_name VARCHAR ( 100 ) UNIQUE NOT NULL,
+    creator_pass VARCHAR ( 100 ),
+    creator_hash VARCHAR ( 100 )
 );
 
 CREATE TABLE world (
