@@ -35,7 +35,7 @@ console = Console()     # markdown output to console
 gamedata = os.environ['HOME'] + "/.kringlecon"  # directory for game data
 gameurl = 'https://white.blk8.de/kringle_gamedata/2021-kringlecon.zip' # url for game data
 
-creator_name = 'Ben Krueger'
+creator_name = 'BenKrueger'
 world_name = 'KringleCon2021'
 
 # all the actions the player can perform
