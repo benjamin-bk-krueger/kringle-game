@@ -48,7 +48,8 @@ CREATE TABLE objective (
     objective_url VARCHAR ( 256 ),
     supported_by VARCHAR ( 100 ),
     requires VARCHAR ( 100 ),
-    objective_img VARCHAR ( 384 )
+    objective_img VARCHAR ( 384 ),
+    quest BYTEA
 );
 
 CREATE UNIQUE INDEX idx_objective_name
@@ -77,16 +78,6 @@ CREATE TABLE junction (
 CREATE UNIQUE INDEX idx_junction_dest
 ON junction ( room_id, dest_id, world_id );
 
-CREATE TABLE quest (
-    quest_id SERIAL PRIMARY KEY,
-    objective_id INT REFERENCES objective ( objective_id ),
-    creator_id INT REFERENCES creator ( creator_id ),
-    quest_text BYTEA
-);
-
-CREATE UNIQUE INDEX idx_quest_creator
-ON quest ( objective_id, creator_id );
-
 CREATE TABLE solution (
     solution_id SERIAL PRIMARY KEY,
     objective_id INT REFERENCES objective ( objective_id ),
@@ -96,3 +87,4 @@ CREATE TABLE solution (
 
 CREATE UNIQUE INDEX idx_solution_creator
 ON solution ( objective_id, creator_id );
+
