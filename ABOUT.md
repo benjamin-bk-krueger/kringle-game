@@ -145,3 +145,10 @@ Things on my todo list: a REST API to modify game data, a markdown export, bette
 Lot of DB rework, linking each table using varchar name fields wasn't quite useful. I have introduced serial IDs, DB queries are a lot easier and reliable now. Sadly I had to adapt a lot of Python code.  
 My today's lessons learned: Have a good design before starting to code ;)  
 I have introduced new tables and Flask views for quests and solutions. This way I can edit and "upload" solutions using the web frontend which is much more user friendly. 
+
+***2022-04-18***
+
+Lot of GUI rework. I have added the CSS stylesheets from https://simplecss.org as well as the Markdown editor from https://easy-markdown-editor.tk. As well as a lot of rework for the Flask HTML templates to make navigation a lot easier.  
+The GUI parts are quite usable now. Still on the Todo list: image import and markdown export. And I guess a lot of security stuff (SQLi, etc.).  
+I will get back to the original Python based game for the next days...   
+If this is as stable as the GUI I will finalize the things there...   
