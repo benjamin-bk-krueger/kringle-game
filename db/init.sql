@@ -49,7 +49,8 @@ CREATE TABLE objective (
     supported_by VARCHAR ( 100 ),
     requires VARCHAR ( 100 ),
     objective_img VARCHAR ( 384 ),
-    quest BYTEA
+    quest BYTEA,
+    solution BYTEA
 );
 
 CREATE UNIQUE INDEX idx_objective_name
