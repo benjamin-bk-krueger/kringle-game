@@ -1,10 +1,11 @@
-FROM ubuntu:20.04
+FROM ubuntu:latest
 
 LABEL version="0.9"
 LABEL maintaner="Ben Krueger <sayhello@blk8.de>"
 
 RUN apt-get update
 RUN apt-get install -y python3 python3-pip python3-psycopg2 jp2a whois
+
 RUN DEBIAN_FRONTEND=noninteractive  apt-get install -y ssh
 
 RUN pip3 install rich
