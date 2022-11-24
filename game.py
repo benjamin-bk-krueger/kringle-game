@@ -406,11 +406,11 @@ def display_solution(md_name):
 # open a connection to PostgreSQL DB and return the connection
 def get_db_connection():
     try:
-        conn = psycopg2.connect(user="postgres",
-                                    password="postgres",
+        conn = psycopg2.connect(user="kringle",
+                                    password="kringle",
                                     host="kringle_database",
                                     port="5432",
-                                    database="postgres")
+                                    database="kringle")
         return conn
     except (Exception, Error) as error:
         return None

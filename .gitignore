@@ -1,1 +1,4 @@
+.aws/
 .idea
+site/
+db/kringle.dump
