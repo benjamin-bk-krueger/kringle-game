@@ -1,4 +1,4 @@
-class bcolors:
+class Bcolors:
     HEADER = '\033[95m'     # titles
     BLUEFG = '\033[94m'     # character, item, room names
     GREENFG = '\033[92m'    # actions, ok
