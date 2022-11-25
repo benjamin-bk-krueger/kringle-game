@@ -1,6 +1,6 @@
 import os  # necessary to access terminal size and file operations
 import readline  # necessary to be able to auto-complete user
-# import urllib.request  # necessary to download game data
+import urllib.request  # necessary to download game data
 # import shutil  # necessary to recursively delete files
 import psycopg2  # necessary to connect to PostGreSQL database
 
@@ -32,6 +32,7 @@ default_actions = ['beam', 'cry', 'exit', 'grab', 'inspect', 'look', 'meditate',
 console = Console()  # markdown output to console
 
 game_data = os.environ['HOME'] + "/.kringlecon"  # directory for game data
+url_prefix = "https://s3.kringle.info:9000/kringle-public/world/KringleCon2021"
 
 creator_name = 'BenKrueger'
 world_name = 'KringleCon2021'
@@ -136,7 +137,7 @@ def look():
     print("You are currently at " + color_object(rooms[location].name) + " and " + color_header("admiring") +
           " what your eyes can see...")
     print("")
-    display_image(rooms[location].name)
+    display_image(rooms[location].img)
     print(rooms[location].description)
 
 
@@ -382,7 +383,7 @@ def yesno():
 def talk_to(objective_id):
     print("")
     print("You are talking to " + color_object(objectives[objective_id].name))
-    display_image(objectives[objective_id].name)
+    display_image(objectives[objective_id].img)
 
     if objectives[objective_id].requires != "none" and not items[objectives[objective_id].requires].visited:
         print("")
@@ -411,14 +412,20 @@ def talk_to(objective_id):
 
 
 # displays a colored ANSI image, depending on the terminal size, requires external program
-def display_image(image_name):
+def display_image(image_url):
     try:
-        # f = open(gamedata + "/images/" + image_name + ".jpg","r")
-        os.system("/bin/jp2a \"" + game_data + "/images/" + image_name + ".jpg\" --colors --fill --color-depth=8")
+        # shutil.rmtree(game_data)
+        # os.mkdir(game_data)
+        urllib.request.urlretrieve(url_prefix + "/" + image_url, game_data + "/" + image_url)
+
+        # f = open(game_data + "/images/" + image_name + ".jpg","r")
+        # os.system("/bin/jp2a \"" + game_data + "/images/" + image_url + ".jpg\" --colors --fill --color-depth=8")
         # f.close()
+        os.system("/bin/jp2a \"" + game_data + "/" + image_url + "\" --colors --fill --color-depth=8")
+
         return True
     except IOError:
-        print(f"Image file not found for {image_name}")
+        print(f"Image file not found for {image_url}")
         return False
 
 
@@ -426,7 +433,7 @@ def display_image(image_name):
 def display_quest(md_name):
     quest = fetch_one_from_db(f'SELECT * FROM objective where objective_id = {md_name};')
     if quest is not None:
-        md = Markdown(str(bytes(quest[3]), 'utf-8'))
+        md = Markdown(str(bytes(quest[11]), 'utf-8'))
         console.print(md)
     else:
         console.print("No quest entry found.")
@@ -480,16 +487,6 @@ def fetch_one_from_db(query):
     return result
 
 
-# update one row from a query
-def update_one_in_db(query):
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute(query)
-    cur.close()
-    conn.commit()
-    conn.close()
-
-
 # parses the JSON based configuration file and creature objects from that configuration, requires json
 def load_data():
     global location
@@ -506,6 +503,7 @@ def load_data():
         room = Room()
         room.name = i[2]
         room.description = i[3]
+        room.img = i[4]
         rooms.update({i[0]: room})
         counter_loaded = counter_loaded + 1
 
@@ -535,12 +533,13 @@ def load_data():
     for i in objective_records:
         objective = Objective()
         objective.name = i[3]
-        objective.description = i[4]
+        objective.description = i[5]
+        objective.img = i[10]
         objective.location = i[1]
-        objective.difficulty = i[5]
-        objective.url = i[6]
-        objective.supportedby = i[7]
-        objective.requires = i[8]
+        objective.difficulty = i[6]
+        objective.url = i[7]
+        objective.supportedby = i[8]
+        objective.requires = i[9]
         objectives.update({i[0]: objective})
         counter_loaded = counter_loaded + 1
 
