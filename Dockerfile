@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM ubuntu:rolling
 
 LABEL version="0.9"
 LABEL maintaner="Ben Krueger <sayhello@blk8.de>"
