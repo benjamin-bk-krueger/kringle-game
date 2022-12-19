@@ -7,7 +7,7 @@ services:
     command: /usr/sbin/sshd -D
     container_name: kringle_game
     volumes:
-      - ./scripts/profile.sh:/home/game/profile.sh
+      - ./scripts/profile.sh:/home/game/.profile
 
   web:
     image: benjaminkrueger/kringle-web
