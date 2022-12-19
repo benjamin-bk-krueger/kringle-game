@@ -7,6 +7,8 @@ CREATE TABLE creator (
     creator_img VARCHAR ( 384 ),
     creator_role VARCHAR ( 20 ),
     active INT default 0,
+    notification INT default 0,
+    password_reset VARCHAR ( 100 ),
     created timestamp default current_timestamp,
     modified timestamp default current_timestamp
 );
@@ -106,6 +108,7 @@ CREATE TABLE solution (
     solution_text BYTEA,
     visible INT default 0,
     completed INT default 0,
+    ctf_flag VARCHAR ( 100 ),
     created timestamp default current_timestamp,
     modified timestamp default current_timestamp
 );

@@ -1,12 +1,10 @@
 import os  # necessary to access terminal size and file operations
 import readline  # necessary to be able to auto-complete user
 import urllib.request  # necessary to download game data
-# import shutil  # necessary to recursively delete files
 import psycopg2  # necessary to connect to PostGreSQL database
 
 from rich.console import Console  # necessary for markdown display
 from rich.markdown import Markdown  # necessary for markdown display
-# from zipfile import ZipFile  # necessary for ZIP handling
 from psycopg2 import Error  # necessary for DB error handling
 
 from room import Room
@@ -16,29 +14,278 @@ from item import Item
 from character import Character
 from colors import Bcolors
 
+# the app configuration is done via environmental variables
+POSTGRES_HOST = os.environ['POSTGRES_HOST']  # DB connection data
+POSTGRES_PORT = os.environ['POSTGRES_PORT']
+POSTGRES_USER = os.environ['POSTGRES_USER']
+POSTGRES_PW = os.environ['POSTGRES_PW']
+POSTGRES_DB = os.environ['POSTGRES_DB']
+S3_FOLDER = os.environ['S3_FOLDER']  # where S3 buckets are located
+GAME_DATA = os.environ['HOME'] + "/.kringlecon"  # directory for game data
+
+WORLD_NAME = 'KringleCon2021'
+CREATOR_NAME = 'BenKrueger'
+URL_PREFIX = S3_FOLDER + "/world/" + WORLD_NAME
+
+# game flow control
 cont = 1  # the program will run until this value is set to 0
 location = 0  # the starting room, changes later in the game by walking around
 
+# game data model
 rooms = dict()  # contains all available rooms
 objectives = dict()  # contains all available objectives
 junctions = dict()  # contains all junctions between the rooms
 items = dict()  # contains all available items
 characters = dict()  # contains all available side characters
 
+# game vocabulary options
 vocabulary = []  # contains autocomplete values
 default_actions = ['beam', 'cry', 'exit', 'grab', 'inspect', 'look', 'meditate', 'phone', 'question', 'recap', 'talk',
                    'walk']  # default actions
 
 console = Console()  # markdown output to console
 
-game_data = os.environ['HOME'] + "/.kringlecon"  # directory for game data
-url_prefix = "https://s3.kringle.info:9000/kringle-public/world/KringleCon2021"
 
-creator_name = 'BenKrueger'
-world_name = 'KringleCon2021'
+# --------------------------------------------------------------
+# database functions
+# --------------------------------------------------------------
+
+# open a connection to PostgresSQL DB and return the connection
+def get_db_connection():
+    try:
+        conn = psycopg2.connect(user=POSTGRES_USER,
+                                password=POSTGRES_PW,
+                                host=POSTGRES_HOST,
+                                port=POSTGRES_PORT,
+                                database=POSTGRES_DB)
+        return conn
+    except (Exception, Error):
+        return None
 
 
-# all the actions the player can perform
+# fetch all rows from a query
+def fetch_all_from_db(query):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute(query)
+    results = cur.fetchall()
+    cur.close()
+    conn.close()
+    return results
+
+
+# fetch only a single row from a query
+def fetch_one_from_db(query):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute(query)
+    result = cur.fetchone()
+    cur.close()
+    conn.close()
+    return result
+
+
+# --------------------------------------------------------------
+# Internal functions
+# --------------------------------------------------------------
+
+# parses the JSON based configuration file and creature objects from that configuration, requires json
+def load_data():
+    global location
+    counter_loaded = 0
+
+    record = fetch_one_from_db("SELECT version();")
+    print("You are connected to - ", record, "\n")
+
+    world = fetch_one_from_db(f'SELECT * FROM world WHERE world_name = \'{WORLD_NAME}\';')
+    world_id = world[0]
+
+    room_records = fetch_all_from_db(f"SELECT * FROM room WHERE world_id = {world_id};")
+    for i in room_records:
+        room = Room()
+        room.name = i[2]
+        room.description = i[3]
+        room.img = i[4]
+        rooms.update({i[0]: room})
+        counter_loaded = counter_loaded + 1
+
+        # the first room is the starting location
+        if location == 0:
+            location = i[0]
+
+    item_records = fetch_all_from_db(f"select * from item WHERE world_id = {world_id};")
+    for i in item_records:
+        item = Item()
+        item.name = i[3]
+        item.description = i[4]
+        item.location = i[1]
+        items.update({i[0]: item})
+        counter_loaded = counter_loaded + 1
+
+    person_records = fetch_all_from_db(f"select * from person WHERE world_id = {world_id};")
+    for i in person_records:
+        character = Character()
+        character.name = i[3]
+        character.description = i[4]
+        character.location = i[1]
+        characters.update({i[0]: character})
+        counter_loaded = counter_loaded + 1
+
+    objective_records = fetch_all_from_db(f"select * from objective WHERE world_id = {world_id};")
+    for i in objective_records:
+        objective = Objective()
+        objective.name = i[3]
+        objective.description = i[5]
+        objective.img = i[10]
+        objective.location = i[1]
+        objective.difficulty = i[6]
+        objective.url = i[7]
+        objective.supportedby = i[8]
+        objective.requires = i[9]
+        objectives.update({i[0]: objective})
+        counter_loaded = counter_loaded + 1
+
+    junction_records = fetch_all_from_db(f"select * from junction WHERE world_id = {world_id};")
+    for i in junction_records:
+        junction = Junction()
+        junction.destination = i[3]
+        junction.location = i[1]
+        junction.description = i[4]
+        junctions.update({i[0]: junction})
+        counter_loaded = counter_loaded + 1
+
+    return counter_loaded
+
+
+# resets the auto-completion to the default actions list
+def set_default_complete():
+    global vocabulary
+    vocabulary = default_actions
+
+
+# sets the auto-completion list to a custom one (necessary for creature and room auto-completion)
+def set_custom_complete(word_list):
+    global vocabulary
+    vocabulary = word_list
+
+
+# auto-completion with Python readline, requires readline
+def auto_complete(text, state):
+    results = [x for x in vocabulary if x.startswith(text)] + [None]
+    return results[state]
+
+
+# terminal colors
+def color_notice(terminal_text):
+    return f"{Bcolors.GREYBG}{terminal_text}{Bcolors.ENDC}"
+
+
+def color_object(terminal_text):
+    return f"{Bcolors.BLUEFG}{terminal_text}{Bcolors.ENDC}"
+
+
+def color_header(terminal_text):
+    return f"{Bcolors.HEADER}{terminal_text}{Bcolors.ENDC}"
+
+
+def color_ok(terminal_text):
+    return f"{Bcolors.GREENFG}{terminal_text}{Bcolors.ENDC}"
+
+
+def color_warning(terminal_text):
+    return f"{Bcolors.YELLOWFG}{terminal_text}{Bcolors.ENDC}"
+
+
+def color_alert(terminal_text):
+    return f"{Bcolors.REDFG}{terminal_text}{Bcolors.ENDC}"
+
+
+# basic yes no question
+def yesno():
+    answer = input(color_notice("I am saying yes ------>") + " ")
+    if answer == "yes" or answer == "y":
+        return True
+    else:
+        return False
+
+
+# talk to a character
+def talk_to(objective_id):
+    print("")
+    print("You are talking to " + color_object(objectives[objective_id].name))
+    display_image(objectives[objective_id].img)
+
+    if objectives[objective_id].requires != "none" and not items[objectives[objective_id].requires].visited:
+        print("")
+        print(color_object(objectives[objective_id].name) + " asks for a " +
+              color_object(objectives[objective_id].requires) + ". Sadly you can't find it in your bag.")
+    else:
+        print("")
+        print(color_object(objectives[objective_id].name) + " gives you following quest:")
+        print("")
+        display_quest(objective_id)
+
+        print("")
+        print(color_object(objectives[objective_id].name) + " asks you if you want to open this quest.")
+        print("")
+        if yesno():
+            print("")
+            print(objectives[objective_id].url)
+
+        print("")
+        print(color_object(objectives[objective_id].name) + " also offers you the solution.")
+        print("Do you want to hear it?")
+        print("")
+        if yesno():
+            print("")
+            display_solution(objective_id)
+
+
+# displays a colored ANSI image, depending on the terminal size, requires external program
+def display_image(image_url):
+    try:
+        # shutil.rmtree(game_data)
+        # os.mkdir(game_data)
+        urllib.request.urlretrieve(URL_PREFIX + "/" + image_url, GAME_DATA + "/" + image_url)
+
+        # f = open(game_data + "/images/" + image_name + ".jpg","r")
+        # os.system("/bin/jp2a \"" + game_data + "/images/" + image_url + ".jpg\" --colors --fill --color-depth=8")
+        # f.close()
+        os.system("/bin/jp2a \"" + GAME_DATA + "/" + image_url + "\" --colors --fill --color-depth=8")
+
+        return True
+    except IOError:
+        print(f"Image file not found for {image_url}")
+        return False
+
+
+# displays a quest markdown page
+def display_quest(md_name):
+    quest = fetch_one_from_db(f'SELECT * FROM objective where objective_id = {md_name};')
+    if quest is not None:
+        md = Markdown(str(bytes(quest[11]), 'utf-8'))
+        console.print(md)
+    else:
+        console.print("No quest entry found.")
+
+
+# displays a solution markdown page
+def display_solution(md_name):
+    creator = fetch_one_from_db(f'SELECT * FROM creator where creator_name = \'{CREATOR_NAME}\';')
+    creator_id = creator[0]
+
+    quest = fetch_one_from_db(f'SELECT * FROM solution where objective_id = {md_name} and creator_id = {creator_id};')
+    if quest is not None:
+        md = Markdown(str(bytes(quest[3]), 'utf-8'))
+        console.print(md)
+    else:
+        console.print("No solution entry found.")
+
+
+# --------------------------------------------------------------
+# player action functions
+# --------------------------------------------------------------
+
 # only triggered once automatically when the player arrives (starts the program) - no command assigned
 def arrive():
     display_image("logo")
@@ -324,235 +571,6 @@ def recap():
           str(len(objectives) - counter_o) + " more waiting for contact.")
     print("You " + color_header("have grabbed") + str(counter_i) + " item(s). Maybe you can put " +
           str(len(items) - counter_i) + " additional one(s) into your bag.")
-
-
-# helper functions, cannot be triggered by the player directly
-# resets the auto-completion to the default actions list
-def set_default_complete():
-    global vocabulary
-    vocabulary = default_actions
-
-
-# sets the auto-completion list to a custom one (necessary for creature and room auto-completion)
-def set_custom_complete(word_list):
-    global vocabulary
-    vocabulary = word_list
-
-
-# auto-completion with Python readline, requires readline
-def auto_complete(text, state):
-    results = [x for x in vocabulary if x.startswith(text)] + [None]
-    return results[state]
-
-
-# terminal colors
-def color_notice(terminal_text):
-    return f"{Bcolors.GREYBG}{terminal_text}{Bcolors.ENDC}"
-
-
-def color_object(terminal_text):
-    return f"{Bcolors.BLUEFG}{terminal_text}{Bcolors.ENDC}"
-
-
-def color_header(terminal_text):
-    return f"{Bcolors.HEADER}{terminal_text}{Bcolors.ENDC}"
-
-
-def color_ok(terminal_text):
-    return f"{Bcolors.GREENFG}{terminal_text}{Bcolors.ENDC}"
-
-
-def color_warning(terminal_text):
-    return f"{Bcolors.YELLOWFG}{terminal_text}{Bcolors.ENDC}"
-
-
-def color_alert(terminal_text):
-    return f"{Bcolors.REDFG}{terminal_text}{Bcolors.ENDC}"
-
-
-# basic yes no question
-def yesno():
-    answer = input(color_notice("I am saying yes ------>") + " ")
-    if answer == "yes" or answer == "y":
-        return True
-    else:
-        return False
-
-
-# talk to a character
-def talk_to(objective_id):
-    print("")
-    print("You are talking to " + color_object(objectives[objective_id].name))
-    display_image(objectives[objective_id].img)
-
-    if objectives[objective_id].requires != "none" and not items[objectives[objective_id].requires].visited:
-        print("")
-        print(color_object(objectives[objective_id].name) + " asks for a " +
-              color_object(objectives[objective_id].requires) + ". Sadly you can't find it in your bag.")
-    else:
-        print("")
-        print(color_object(objectives[objective_id].name) + " gives you following quest:")
-        print("")
-        display_quest(objective_id)
-
-        print("")
-        print(color_object(objectives[objective_id].name) + " asks you if you want to open this quest.")
-        print("")
-        if yesno():
-            print("")
-            print(objectives[objective_id].url)
-
-        print("")
-        print(color_object(objectives[objective_id].name) + " also offers you the solution.")
-        print("Do you want to hear it?")
-        print("")
-        if yesno():
-            print("")
-            display_solution(objective_id)
-
-
-# displays a colored ANSI image, depending on the terminal size, requires external program
-def display_image(image_url):
-    try:
-        # shutil.rmtree(game_data)
-        # os.mkdir(game_data)
-        urllib.request.urlretrieve(url_prefix + "/" + image_url, game_data + "/" + image_url)
-
-        # f = open(game_data + "/images/" + image_name + ".jpg","r")
-        # os.system("/bin/jp2a \"" + game_data + "/images/" + image_url + ".jpg\" --colors --fill --color-depth=8")
-        # f.close()
-        os.system("/bin/jp2a \"" + game_data + "/" + image_url + "\" --colors --fill --color-depth=8")
-
-        return True
-    except IOError:
-        print(f"Image file not found for {image_url}")
-        return False
-
-
-# displays a quest markdown page
-def display_quest(md_name):
-    quest = fetch_one_from_db(f'SELECT * FROM objective where objective_id = {md_name};')
-    if quest is not None:
-        md = Markdown(str(bytes(quest[11]), 'utf-8'))
-        console.print(md)
-    else:
-        console.print("No quest entry found.")
-
-
-# displays a solution markdown page
-def display_solution(md_name):
-    creator = fetch_one_from_db(f'SELECT * FROM creator where creator_name = \'{creator_name}\';')
-    creator_id = creator[0]
-
-    quest = fetch_one_from_db(f'SELECT * FROM solution where objective_id = {md_name} and creator_id = {creator_id};')
-    if quest is not None:
-        md = Markdown(str(bytes(quest[3]), 'utf-8'))
-        console.print(md)
-    else:
-        console.print("No solution entry found.")
-
-
-# open a connection to PostgresSQL DB and return the connection
-def get_db_connection():
-    try:
-        conn = psycopg2.connect(user="kringle",
-                                password="kringle",
-                                host="kringle_database",
-                                port="5432",
-                                database="kringle")
-        return conn
-    except (Exception, Error):
-        return None
-
-
-# fetch all rows from a query
-def fetch_all_from_db(query):
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute(query)
-    results = cur.fetchall()
-    cur.close()
-    conn.close()
-    return results
-
-
-# fetch only a single row from a query
-def fetch_one_from_db(query):
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute(query)
-    result = cur.fetchone()
-    cur.close()
-    conn.close()
-    return result
-
-
-# parses the JSON based configuration file and creature objects from that configuration, requires json
-def load_data():
-    global location
-    counter_loaded = 0
-
-    record = fetch_one_from_db("SELECT version();")
-    print("You are connected to - ", record, "\n")
-
-    world = fetch_one_from_db(f'SELECT * FROM world WHERE world_name = \'{world_name}\';')
-    world_id = world[0]
-
-    room_records = fetch_all_from_db(f"SELECT * FROM room WHERE world_id = {world_id};")
-    for i in room_records:
-        room = Room()
-        room.name = i[2]
-        room.description = i[3]
-        room.img = i[4]
-        rooms.update({i[0]: room})
-        counter_loaded = counter_loaded + 1
-
-        # the first room is the starting location
-        if location == 0:
-            location = i[0]
-
-    item_records = fetch_all_from_db(f"select * from item WHERE world_id = {world_id};")
-    for i in item_records:
-        item = Item()
-        item.name = i[3]
-        item.description = i[4]
-        item.location = i[1]
-        items.update({i[0]: item})
-        counter_loaded = counter_loaded + 1
-
-    person_records = fetch_all_from_db(f"select * from person WHERE world_id = {world_id};")
-    for i in person_records:
-        character = Character()
-        character.name = i[3]
-        character.description = i[4]
-        character.location = i[1]
-        characters.update({i[0]: character})
-        counter_loaded = counter_loaded + 1
-
-    objective_records = fetch_all_from_db(f"select * from objective WHERE world_id = {world_id};")
-    for i in objective_records:
-        objective = Objective()
-        objective.name = i[3]
-        objective.description = i[5]
-        objective.img = i[10]
-        objective.location = i[1]
-        objective.difficulty = i[6]
-        objective.url = i[7]
-        objective.supportedby = i[8]
-        objective.requires = i[9]
-        objectives.update({i[0]: objective})
-        counter_loaded = counter_loaded + 1
-
-    junction_records = fetch_all_from_db(f"select * from junction WHERE world_id = {world_id};")
-    for i in junction_records:
-        junction = Junction()
-        junction.destination = i[3]
-        junction.location = i[1]
-        junction.description = i[4]
-        junctions.update({i[0]: junction})
-        counter_loaded = counter_loaded + 1
-
-    return counter_loaded
 
 
 # queries the user to enter a command and triggers the matching function
