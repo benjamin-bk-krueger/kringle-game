@@ -22,14 +22,11 @@ POSTGRES_PW = os.environ['POSTGRES_PW']
 POSTGRES_DB = os.environ['POSTGRES_DB']
 S3_FOLDER = os.environ['S3_FOLDER']  # where S3 buckets are located
 GAME_DATA = os.environ['HOME'] + "/.kringlecon"  # directory for game data
-
-WORLD_NAME = 'KringleCon2021'
-CREATOR_NAME = 'BenKrueger'
-URL_PREFIX = S3_FOLDER + "/world/" + WORLD_NAME
+URL_PREFIX = S3_FOLDER + "/world/" + "DEMO_WORLD"  # S3 files for specific world
 
 # game flow control
-cont = 1  # the program will run until this value is set to 0
-location = 0  # the starting room, changes later in the game by walking around
+PROG_CONT = 1  # the program will run until this value is set to 0
+PROG_LOC = 0  # the starting room, changes later in the game by walking around
 
 # game data model
 rooms = dict()  # contains all available rooms
@@ -89,70 +86,91 @@ def fetch_one_from_db(query):
 # Internal functions
 # --------------------------------------------------------------
 
-# parses the JSON based configuration file and creature objects from that configuration, requires json
+# loads game data from a Postgres DB into a data model
 def load_data():
-    global location
+    global PROG_LOC
+    global URL_PREFIX
+
     counter_loaded = 0
 
     record = fetch_one_from_db("SELECT version();")
-    print("You are connected to - ", record, "\n")
+    print("You are connected.\n")
 
-    world = fetch_one_from_db(f'SELECT * FROM world WHERE world_name = \'{WORLD_NAME}\';')
-    world_id = world[0]
+    counter = 0
+    world_id = 0
+    print("Please select a " + color_header("world"))
+    all_worlds = fetch_all_from_db(f"select * from world order by world_id asc;")
+    for world in all_worlds:
+        counter = counter + 1
+        print(f"|- [{world[0]}] {world[2]}")
 
-    room_records = fetch_all_from_db(f"SELECT * FROM room WHERE world_id = {world_id};")
-    for i in room_records:
-        room = Room()
-        room.name = i[2]
-        room.description = i[3]
-        room.img = i[4]
-        rooms.update({i[0]: room})
-        counter_loaded = counter_loaded + 1
+    if counter > 0:
+        print("")
+        id_text = input(color_notice("I want to discover ---->") + " ")
+        try:
+            world_id = int(id_text)
+        except ValueError:
+            world_id = 0
+        set_default_complete()
 
-        # the first room is the starting location
-        if location == 0:
-            location = i[0]
+    if world_id > 0:
+        for world in all_worlds:
+            if world[0] == world_id:
+                URL_PREFIX = S3_FOLDER + "/world/" + world[2]
 
-    item_records = fetch_all_from_db(f"select * from item WHERE world_id = {world_id};")
-    for i in item_records:
-        item = Item()
-        item.name = i[3]
-        item.description = i[4]
-        item.location = i[1]
-        items.update({i[0]: item})
-        counter_loaded = counter_loaded + 1
+        room_records = fetch_all_from_db(f"SELECT * FROM room WHERE world_id = {world_id} order by room_id asc;")
+        for i in room_records:
+            room = Room()
+            room.name = i[2]
+            room.description = i[3]
+            room.img = i[4]
+            rooms.update({i[0]: room})
+            counter_loaded = counter_loaded + 1
 
-    person_records = fetch_all_from_db(f"select * from person WHERE world_id = {world_id};")
-    for i in person_records:
-        character = Character()
-        character.name = i[3]
-        character.description = i[4]
-        character.location = i[1]
-        characters.update({i[0]: character})
-        counter_loaded = counter_loaded + 1
+            # the first room is the starting location
+            if PROG_LOC == 0:
+                PROG_LOC = i[0]
 
-    objective_records = fetch_all_from_db(f"select * from objective WHERE world_id = {world_id};")
-    for i in objective_records:
-        objective = Objective()
-        objective.name = i[3]
-        objective.description = i[5]
-        objective.img = i[10]
-        objective.location = i[1]
-        objective.difficulty = i[6]
-        objective.url = i[7]
-        objective.supportedby = i[8]
-        objective.requires = i[9]
-        objectives.update({i[0]: objective})
-        counter_loaded = counter_loaded + 1
+        item_records = fetch_all_from_db(f"select * from item WHERE world_id = {world_id} order by item_id asc;")
+        for i in item_records:
+            item = Item()
+            item.name = i[3]
+            item.description = i[4]
+            item.location = i[1]
+            items.update({i[0]: item})
+            counter_loaded = counter_loaded + 1
 
-    junction_records = fetch_all_from_db(f"select * from junction WHERE world_id = {world_id};")
-    for i in junction_records:
-        junction = Junction()
-        junction.destination = i[3]
-        junction.location = i[1]
-        junction.description = i[4]
-        junctions.update({i[0]: junction})
-        counter_loaded = counter_loaded + 1
+        person_records = fetch_all_from_db(f"select * from person WHERE world_id = {world_id} order by person_id asc;")
+        for i in person_records:
+            character = Character()
+            character.name = i[3]
+            character.description = i[4]
+            character.location = i[1]
+            characters.update({i[0]: character})
+            counter_loaded = counter_loaded + 1
+
+        objective_records = fetch_all_from_db(f"select * from objective WHERE world_id = {world_id} order by objective_id asc;")
+        for i in objective_records:
+            objective = Objective()
+            objective.name = i[3]
+            objective.description = i[5]
+            objective.img = i[10]
+            objective.location = i[1]
+            objective.difficulty = i[6]
+            objective.url = i[7]
+            objective.supportedby = i[8]
+            objective.requires = i[9]
+            objectives.update({i[0]: objective})
+            counter_loaded = counter_loaded + 1
+
+        junction_records = fetch_all_from_db(f"select * from junction WHERE world_id = {world_id} order by junction_id asc;")
+        for i in junction_records:
+            junction = Junction()
+            junction.destination = i[3]
+            junction.location = i[1]
+            junction.description = i[4]
+            junctions.update({i[0]: junction})
+            counter_loaded = counter_loaded + 1
 
     return counter_loaded
 
@@ -232,13 +250,13 @@ def talk_to(objective_id):
             print("")
             print(objectives[objective_id].url)
 
-        print("")
-        print(color_object(objectives[objective_id].name) + " also offers you the solution.")
-        print("Do you want to hear it?")
-        print("")
-        if yesno():
-            print("")
-            display_solution(objective_id)
+        # print("")
+        # print(color_object(objectives[objective_id].name) + " also offers you the solution.")
+        # print("Do you want to hear it?")
+        # print("")
+        # if yesno():
+        #     print("")
+        #     display_solution(objective_id)
 
 
 # displays a colored ANSI image, depending on the terminal size, requires external program
@@ -270,16 +288,16 @@ def display_quest(md_name):
 
 
 # displays a solution markdown page
-def display_solution(md_name):
-    creator = fetch_one_from_db(f'SELECT * FROM creator where creator_name = \'{CREATOR_NAME}\';')
-    creator_id = creator[0]
-
-    quest = fetch_one_from_db(f'SELECT * FROM solution where objective_id = {md_name} and creator_id = {creator_id};')
-    if quest is not None:
-        md = Markdown(str(bytes(quest[3]), 'utf-8'))
-        console.print(md)
-    else:
-        console.print("No solution entry found.")
+#def display_solution(md_name):
+#    creator = fetch_one_from_db(f'SELECT * FROM creator where creator_name = \'{CREATOR_NAME}\';')
+#    creator_id = creator[0]
+#
+#    quest = fetch_one_from_db(f'SELECT * FROM solution where objective_id = {md_name} and creator_id = {creator_id};')
+#    if quest is not None:
+#        md = Markdown(str(bytes(quest[3]), 'utf-8'))
+#        console.print(md)
+#    else:
+#        console.print("No solution entry found.")
 
 
 # --------------------------------------------------------------
@@ -293,7 +311,7 @@ def arrive():
     print("You are arriving at a " + color_header("strange and unknown location") + ".")
     print("You are feeling a little dizzy.")
     print("What should be your " + color_ok("next steps") + "? You are pausing for a moment.")
-    rooms[location].visited = True
+    rooms[PROG_LOC].visited = True
 
 
 # get some about information - "scrutinize" command assigned
@@ -341,7 +359,7 @@ def inspect():
     print("")
 
     for objective_id, objective in objectives.items():
-        if objective.location == location:
+        if objective.location == PROG_LOC:
             print("In this room you can see " + color_object(objective.name) + objective.description + ".")
             if objective.supportedby != "none":
                 print("|- " + objective.supportedby + " can you give some hints for this quest.")
@@ -352,19 +370,19 @@ def inspect():
             print("")
 
     for item_id, item in items.items():
-        if item.location == location:
+        if item.location == PROG_LOC:
             if not item.visited:
                 print("In a corner you can see a " + color_object(item.name) + " lying around. You guess it's a " +
                       item.description + ".")
                 print("")
 
     for character_id, character in characters.items():
-        if character.location == location:
+        if character.location == PROG_LOC:
             print("Furthermore you can see " + color_object(character.name) + " " + character.description)
             print("")
 
     for junction_id, junction in junctions.items():
-        if junction.location == location:
+        if junction.location == PROG_LOC:
             print(junction.description + " you can see a junction to " +
                   color_object(rooms[junction.destination].name) + ".")
             if rooms[junction.destination].visited:
@@ -381,11 +399,11 @@ def meditate():
 
 # have a quick look at this place - "look" command assigned
 def look():
-    print("You are currently at " + color_object(rooms[location].name) + " and " + color_header("admiring") +
+    print("You are currently at " + color_object(rooms[PROG_LOC].name) + " and " + color_header("admiring") +
           " what your eyes can see...")
     print("")
-    display_image(rooms[location].img)
-    print(rooms[location].description)
+    display_image(rooms[PROG_LOC].img)
+    print(rooms[PROG_LOC].description)
 
 
 # phone other creatures you already have discovered - "phone" command assigned
@@ -427,7 +445,7 @@ def talk():
     # assign all creatures in this room to the auto-completion list
     counter = 0
     for objective_id, objective in objectives.items():
-        if objective.location == location:
+        if objective.location == PROG_LOC:
             counter = counter + 1
             print(f"|- [{objective_id}] {objective.name}")
 
@@ -453,7 +471,7 @@ def talk():
 # beam to places you already have discovered - "beam" command assigned
 def beam():
     # necessary for room name auto-completion and new room selection
-    global location
+    global PROG_LOC
 
     print("You put your hand into your left pocket and " + color_header("grab a magical device") + ".")
     print("It has a display where you can see the names of all the places you have visited.")
@@ -473,10 +491,10 @@ def beam():
             destination = int(dest)
         except ValueError:
             destination = 0
-        if location != destination and destination in rooms:
+        if PROG_LOC != destination and destination in rooms:
             print("")
             print("You are " + color_ok("going to") + " " + rooms[destination].name)
-            location = destination
+            PROG_LOC = destination
         else:
             print("")
             print("You decide to " + color_alert("stay") + " where you currently are.")
@@ -489,14 +507,14 @@ def beam():
 # walk to other places - "walk" command assigned
 def walk():
     # necessary for room name auto-completion and new room selection
-    global location
+    global PROG_LOC
 
     print("You " + color_header("look around") + " for other places to reach.")
 
     # assign all connected rooms to the auto-completion list
     counter = 0
     for junction_id, junction in junctions.items():
-        if junction.location == location:
+        if junction.location == PROG_LOC:
             counter = counter + 1
             print(f"|- [{junction.destination}] {rooms[junction.destination].name}")
 
@@ -507,10 +525,10 @@ def walk():
             destination = int(dest)
         except ValueError:
             destination = 0
-        if location != destination and destination in rooms:
+        if PROG_LOC != destination and destination in rooms:
             print("")
             print("You are " + color_ok("going to") + " " + rooms[destination].name)
-            location = destination
+            PROG_LOC = destination
             rooms[destination].visited = True
         else:
             print("")
@@ -527,7 +545,7 @@ def grab():
     # assign all items in this room to the auto-completion list
     counter = 0
     for item_id, item in items.items():
-        if item.location == location and item.visited is not True:
+        if item.location == PROG_LOC and item.visited is not True:
             counter = counter + 1
             print(f"|- [{item_id}] {item.name}")
 
@@ -575,7 +593,7 @@ def recap():
 
 # queries the user to enter a command and triggers the matching function
 def query_user():
-    global cont
+    global PROG_CONT
     print("")
     cmd = input(color_notice("I want to ------------>") + " ")
     print("")
@@ -586,7 +604,7 @@ def query_user():
     elif cmd == "beam" or cmd == "b":
         beam()
     elif cmd == "exit" or cmd == "e":
-        cont = 0
+        PROG_CONT = 0
     elif cmd == "grab" or cmd == "g":
         grab()
     elif (cmd == "inspect") or cmd == "i":
@@ -631,7 +649,7 @@ if __name__ == '__main__':
         print("")
         print("You are looking at a green field.")
 
-    while cont == 1:
+    while PROG_CONT == 1:
         query_user()
 else:
     print(f"Cannot be run as module import: {__name__}")
