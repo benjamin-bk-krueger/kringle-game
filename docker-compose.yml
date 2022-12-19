@@ -4,15 +4,10 @@ services:
   game:
     # build: .
     image: benjaminkrueger/kringle-game
-    environment:
-      - POSTGRES_HOST=kringle_database
-      - POSTGRES_PORT=5432
-      - POSTGRES_USER=kringle
-      - POSTGRES_PW=kringle
-      - POSTGRES_DB=kringle
-      - S3_FOLDER=http://localhost:9000/kringle-public
     command: /usr/sbin/sshd -D
     container_name: kringle_game
+    volumes:
+      - ./scripts/profile.sh:/home/game/.profile
 
   web:
     image: benjaminkrueger/kringle-web
