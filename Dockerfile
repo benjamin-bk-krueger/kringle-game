@@ -14,6 +14,9 @@ RUN apt-get clean
 RUN rm -rf /var/lib/apt/lists/*
 
 RUN mkdir /run/sshd
+RUN sed -i "s/session    optional     pam_motd.so  motd=\/run\/motd.dynamic/#session    optional     pam_motd.so  motd=\/run\/motd.dynamic/g" /etc/pam.d/sshd
+RUN sed -i "s/session    optional     pam_motd.so noupdate/#session    optional     pam_motd.so noupdate/g" /etc/pam.d/sshd
+RUN sed -i "s/#PrintLastLog yes/PrintLastLog no/g" /etc/ssh/sshd_config
 
 RUN useradd -m -s /home/game/game.sh -p $(mkpasswd --hash=SHA-512 game) game
 

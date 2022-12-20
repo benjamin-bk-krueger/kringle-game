@@ -27,6 +27,7 @@ URL_PREFIX = S3_FOLDER + "/world/" + "DEMO_WORLD"  # S3 files for specific world
 # game flow control
 PROG_CONT = 1  # the program will run until this value is set to 0
 PROG_LOC = 0  # the starting room, changes later in the game by walking around
+PROG_LOGO = "logo"  # logo
 
 # game data model
 rooms = dict()  # contains all available rooms
@@ -89,12 +90,13 @@ def fetch_one_from_db(query):
 # loads game data from a Postgres DB into a data model
 def load_data():
     global PROG_LOC
+    global PROG_LOGO
     global URL_PREFIX
 
     counter_loaded = 0
 
     record = fetch_one_from_db("SELECT version();")
-    print("You are connected.\n")
+    print("Welcome to KringleGames.\n")
 
     counter = 0
     world_id = 0
@@ -117,6 +119,7 @@ def load_data():
         for world in all_worlds:
             if world[0] == world_id:
                 URL_PREFIX = S3_FOLDER + "/world/" + world[2]
+                PROG_LOGO = world[5]
 
         room_records = fetch_all_from_db(f"SELECT * FROM room WHERE world_id = {world_id} order by room_id asc;")
         for i in room_records:
@@ -306,7 +309,7 @@ def display_quest(md_name):
 
 # only triggered once automatically when the player arrives (starts the program) - no command assigned
 def arrive():
-    display_image("logo")
+    display_image(PROG_LOGO)
     print("")
     print("You are arriving at a " + color_header("strange and unknown location") + ".")
     print("You are feeling a little dizzy.")
@@ -359,8 +362,8 @@ def inspect():
     print("")
 
     for objective_id, objective in objectives.items():
-        if objective.location == PROG_LOC:
-            print("In this room you can see " + color_object(objective.name) + objective.description + ".")
+        if objective.location == PROG_LOC and objective.difficulty > 0:
+            print("In this room you can see " + color_object(objective.name) + ". " + objective.description)
             if objective.supportedby != "none":
                 print("|- " + objective.supportedby + " can you give some hints for this quest.")
             if objective.visited:
@@ -372,13 +375,12 @@ def inspect():
     for item_id, item in items.items():
         if item.location == PROG_LOC:
             if not item.visited:
-                print("In a corner you can see a " + color_object(item.name) + " lying around. You guess it's a " +
-                      item.description + ".")
+                print("In a corner you can see a " + color_object(item.name) + " lying around. " + item.description)
                 print("")
 
     for character_id, character in characters.items():
         if character.location == PROG_LOC:
-            print("Furthermore you can see " + color_object(character.name) + " " + character.description)
+            print("Furthermore you can see " + color_object(character.name) + ". " + character.description)
             print("")
 
     for junction_id, junction in junctions.items():
@@ -393,8 +395,8 @@ def inspect():
 
 # think about the main quest in the game, triggered automatically when the player arrives - "meditate" command assigned
 def meditate():
-    print("A quest to " + color_header("save Santa") + " has brought you to this place.")
-    print("You think about how all those characters here could help you.")
+    print("A quest to " + color_header("help Santa") + " has brought you to this place.")
+    print("You think about how all those creatures here could aid you in your quest.")
 
 
 # have a quick look at this place - "look" command assigned
@@ -403,6 +405,7 @@ def look():
           " what your eyes can see...")
     print("")
     display_image(rooms[PROG_LOC].img)
+    print("")
     print(rooms[PROG_LOC].description)
 
 
@@ -583,11 +586,11 @@ def recap():
     for item_id, item in items.items():
         if item.visited:
             counter_i = counter_i + 1
-    print("You " + color_header("have visited") + str(counter_r) + " room(s). You feel like there is/are " +
+    print("You " + color_header("have visited") + " " + str(counter_r) + " room(s). You feel like there is/are " +
           str(len(rooms) - counter_r) + " more to discover.")
     print("You " + color_header("have talked") + " to " + str(counter_o) + " creature(s). You guess there is/are " +
           str(len(objectives) - counter_o) + " more waiting for contact.")
-    print("You " + color_header("have grabbed") + str(counter_i) + " item(s). Maybe you can put " +
+    print("You " + color_header("have grabbed") + " " + str(counter_i) + " item(s). Maybe you can put " +
           str(len(items) - counter_i) + " additional one(s) into your bag.")
 
 
