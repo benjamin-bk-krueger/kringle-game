@@ -108,7 +108,7 @@ def load_data():
 
     if counter > 0:
         print("")
-        id_text = input(color_notice("I want to discover ---->") + " ")
+        id_text = input(color_notice("I want to discover [id] ---->") + " ")
         try:
             world_id = int(id_text)
         except ValueError:
@@ -223,7 +223,7 @@ def color_alert(terminal_text):
 
 # basic yes no question
 def yesno():
-    answer = input(color_notice("I am saying yes ------>") + " ")
+    answer = input(color_notice("I am saying [y,yes] or [n,no] ---->") + " ")
     if answer == "yes" or answer == "y":
         return True
     else:
@@ -253,13 +253,31 @@ def talk_to(objective_id):
             print("")
             print(objectives[objective_id].url)
 
-        # print("")
-        # print(color_object(objectives[objective_id].name) + " also offers you the solution.")
-        # print("Do you want to hear it?")
-        # print("")
-        # if yesno():
-        #     print("")
-        #     display_solution(objective_id)
+        print("")
+        print(color_object(objectives[objective_id].name) + " says he might know people who have solved this quest.")
+        all_solutions = fetch_all_from_db(f"select s.solution_id, c.creator_name, s.solution_text from solution s, objective o, world w, creator c where o.objective_id={objective_id} and s.visible = 1 and s.objective_id = o.objective_id and o.world_id = w.world_id and w.visible = 1 and s.creator_id = c.creator_id;")
+        counter = 0
+        for solution in all_solutions:
+            counter = counter + 1
+            print(f"|- [{solution[0]}] {solution[1]}")
+
+        if counter > 0:
+            print("")
+            id_text = input(color_notice("I want to hear the solution from [id] ---->") + " ")
+            try:
+                solution_id = int(id_text)
+            except ValueError:
+                solution_id = 0
+            if solution_id > 0:
+                print("")
+                display_solution(solution[2])
+            else:
+                print("")
+                print("You decide you " + color_alert("don't want to hear that solution") + " right now.")
+        else:
+            print("")
+            print("After a moment " + color_object(objectives[objective_id].name) + " mentions " + color_alert("no one has created a solution") + " yet.")
+        set_default_complete()
 
 
 # displays a colored ANSI image, depending on the terminal size, requires external program
@@ -291,16 +309,12 @@ def display_quest(md_name):
 
 
 # displays a solution markdown page
-#def display_solution(md_name):
-#    creator = fetch_one_from_db(f'SELECT * FROM creator where creator_name = \'{CREATOR_NAME}\';')
-#    creator_id = creator[0]
-#
-#    quest = fetch_one_from_db(f'SELECT * FROM solution where objective_id = {md_name} and creator_id = {creator_id};')
-#    if quest is not None:
-#        md = Markdown(str(bytes(quest[3]), 'utf-8'))
-#        console.print(md)
-#    else:
-#        console.print("No solution entry found.")
+def display_solution(solution):
+    if solution is not None:
+        md = Markdown(str(bytes(solution), 'utf-8'))
+        console.print(md)
+    else:
+        console.print("No solution entry found.")
 
 
 # --------------------------------------------------------------
@@ -424,7 +438,7 @@ def phone():
 
     if counter > 0:
         print("")
-        id_text = input(color_notice("I want to talk to ---->") + " ")
+        id_text = input(color_notice("I want to talk to [id] ---->") + " ")
         try:
             objective_id = int(id_text)
         except ValueError:
@@ -454,7 +468,7 @@ def talk():
 
     if counter > 0:
         print("")
-        id_text = input(color_notice("I want to talk to ---->") + " ")
+        id_text = input(color_notice("I want to talk to [id] ---->") + " ")
         try:
             objective_id = int(id_text)
         except ValueError:
@@ -489,7 +503,7 @@ def beam():
 
     if counter > 0:
         print("")
-        dest = input(color_notice("I want to go to ------>") + " ")
+        dest = input(color_notice("I want to go to [id] ---->") + " ")
         try:
             destination = int(dest)
         except ValueError:
@@ -523,7 +537,7 @@ def walk():
 
     if counter > 0:
         print("")
-        dest = input(color_notice("I want to go to ------>") + " ")
+        dest = input(color_notice("I want to go to [id] ---->") + " ")
         try:
             destination = int(dest)
         except ValueError:
@@ -554,7 +568,7 @@ def grab():
 
     if counter > 0:
         print("")
-        id_text = input(f"{Bcolors.GREYBG}I want to grab ------->{Bcolors.ENDC} ")
+        id_text = input(color_notice("I want to grab [id] ---->") + " ")
         try:
             item_id = int(id_text)
         except ValueError:
@@ -598,7 +612,7 @@ def recap():
 def query_user():
     global PROG_CONT
     print("")
-    cmd = input(color_notice("I want to ------------>") + " ")
+    cmd = input(color_notice("I want to [command] ---->") + " ")
     print("")
     if cmd == "cheat":
         cheat()
