@@ -152,3 +152,10 @@ Lot of GUI rework. I have added the CSS stylesheets from https://simplecss.org a
 The GUI parts are quite usable now. Still on the Todo list: image import and markdown export. And I guess a lot of security stuff (SQLi, etc.).  
 I will get back to the original Python based game for the next days...   
 If this is as stable as the GUI I will finalize the things there...   
+
+***2022-12-30***
+
+Just found that file while looking through my repository.  
+Almost a year has passed now and so much has happened (too much, so I can't document it here).  
+Thanks, SANS, what a wonderful journey.  
+2023 is coming ... Ben off ...  
